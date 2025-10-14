@@ -1,0 +1,93 @@
+/* Calendar specific styles */
+.calendar-container {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background: #b91c1c;
+    color: white;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.calendar-title {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.cal-btn {
+    background: white;
+    color: #b91c1c;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.cal-btn:hover { background: #fde8e8; }
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 0.5rem 0;
+}
+
+.weekend { color: #dc2626; }
+
+.day {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    min-height: 90px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.day.outside { color: #9ca3af; background: #fafafa; }
+.day.today { border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220,38,38,0.15) inset; }
+.day.highlight { outline: 2px solid #10b981; outline-offset: -2px; }
+
+.day-number { font-size: 0.875rem; font-weight: 600; }
+
+.event {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event.registered { background: #dc2626; }
+.event.open { background: #10b981; }
+.event.completed { background: #f59e0b; color: #1a1a1a; }
+
+.calendar-legend { margin-top: 12px; display: flex; gap: 12px; color: #6b7280; }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
+.badge { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+.badge-registered { background: #dc2626; }
+.badge-open { background: #10b981; }
+.badge-completed { background: #f59e0b; }
+
+@media (max-width: 768px) { .day { min-height: 70px; } }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logo Generator</title>
+</head>
+<body>
+    <canvas id="logoCanvas" width="200" height="200" style="border: 1px solid #ccc;"></canvas>
+    <br><br>
+    <button onclick="downloadLogo()">Download Logo</button>
+    
+    <script>
+        const canvas = document.getElementById('logoCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create a simple MFU-style logo
+        function createLogo() {
+            // Background circle
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath();
+            ctx.arc(100, 100, 80, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // White border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // MFU text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('MFU', 100, 100);
+        }
+        
+        function downloadLogo() {
+            createLogo();
+            const link = document.createElement('a');
+            link.download = 'Top-bar-logo.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Create logo on page load
+        createLogo();
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFU Activity Board - Calendar</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="calendar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <aside class="sidebar open" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-text">MFU</div>
+                <span class="brand-text">Activity Board</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <i class="fas fa-list"></i>
+                        <span>Feed</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calendar"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        <span>My Activities</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Log out</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-logo">
+                    <div class="flame-icon">🔥</div>
+                    <span class="header-brand">MFU Activity Board</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Find activities, clubs organizer..." class="search-input">
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-profile">
+                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face" alt="Profile" class="profile-img">
+                    <span class="profile-name">Miss Jane Doe</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="content-header">
+                <h1 class="page-title">Calendar</h1>
+            </div>
+
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="cal-btn" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <div class="calendar-title" id="calendarTitle">October 2025</div>
+                    <button class="cal-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Weekday headers -->
+                    <div class="weekday">Mo</div>
+                    <div class="weekday">Tu</div>
+                    <div class="weekday">We</div>
+                    <div class="weekday">Th</div>
+                    <div class="weekday">Fr</div>
+                    <div class="weekday weekend">Sa</div>
+                    <div class="weekday weekend">Su</div>
+                    <!-- Days will be injected by JS -->
+                </div>
+                <div class="calendar-legend">
+                    <span class="legend-item"><span class="badge badge-registered"></span> Registered</span>
+                    <span class="legend-item"><span class="badge badge-open"></span> Open</span>
+                    <span class="legend-item"><span class="badge badge-completed"></span> Completed</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+    <script src="calendar.js"></script>
+</body>
+</html>

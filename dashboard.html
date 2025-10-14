@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFU Activity Board - Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-text">MFU</div>
+                <span class="brand-text">Activity Board</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item active">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-list"></i>
+                        <span>Feed</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="calendar.html" class="nav-link">
+                        <i class="fas fa-calendar"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        <span>My Activities</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Log out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-logo">
+                    <div class="flame-icon">🔥</div>
+                    <span class="header-brand">MFU Activity Board</span>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Find activities, clubs organizer..." class="search-input">
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="user-profile">
+                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face" alt="Profile" class="profile-img">
+                    <span class="profile-name">Miss Jane Doe</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="content-header">
+                <h1 class="page-title">Feed</h1>
+            </div>
+            
+            <!-- Activity Grid -->
+            <div class="activity-grid">
+                <!-- Activity Card 1 -->
+                <div class="activity-card" data-date="2025-10-13">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=200&fit=crop" alt="Basketball Tournament">
+                        <div class="status-tag registered">Registered</div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Annual Basketball Tournament</h3>
+                        <div class="card-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>13/3/26</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>1:30 PM</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Basketball court</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Card 2 -->
+                <div class="activity-card" data-date="2025-10-11">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=200&fit=crop" alt="Football Tournament">
+                        <div class="status-tag open">Open for Registration</div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Football Tournament</h3>
+                        <div class="card-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>12/3/26</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>1:30 PM</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>MFU Outdoor stadium</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Card 3 -->
+                <div class="activity-card" data-date="2025-10-11">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=200&fit=crop" alt="Archery Activity">
+                        <div class="status-tag registered">Registered</div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Archery activity</h3>
+                        <div class="card-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>12/3/26</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>1:30 PM</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Some ajarn's house</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Card 4 -->
+                <div class="activity-card" data-date="2025-10-10">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=200&fit=crop" alt="Archery Tournament">
+                        <div class="status-tag completed">Completed</div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Archery activity first tournament</h3>
+                        <div class="card-details">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>10/3/26</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>1:30 PM</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Some ajarn's house</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a href="#" class="pagination-btn prev">
+                    <i class="fas fa-chevron-left"></i>
+                    <span>Previous</span>
+                </a>
+                <div class="pagination-numbers">
+                    <a href="#" class="page-number active">1</a>
+                    <a href="#" class="page-number">2</a>
+                    <a href="#" class="page-number">3</a>
+                    <span class="page-ellipsis">...</span>
+                    <a href="#" class="page-number">67</a>
+                    <a href="#" class="page-number">68</a>
+                </div>
+                <a href="#" class="pagination-btn next">
+                    <span>Next</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
