@@ -1,5 +1,8 @@
 // Dashboard functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Load profile data from localStorage
+    loadProfileData();
+
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const mobileOverlay = document.getElementById('mobileOverlay');
@@ -146,11 +149,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // User profile dropdown (placeholder)
+    // User profile click - navigate to profile page
     const userProfile = document.querySelector('.user-profile');
-    userProfile.addEventListener('click', function() {
-        showMessage('User profile menu (placeholder)', 'info');
-    });
+    if (userProfile) {
+        // Remove all existing listeners by cloning the element
+        const newUserProfile = userProfile.cloneNode(true);
+        userProfile.parentNode.replaceChild(newUserProfile, userProfile);
+        
+        newUserProfile.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Profile clicked, navigating to profile.html');
+            
+            // Don't navigate if we're already on the profile page
+            if (!window.location.pathname.includes('profile.html')) {
+                window.location.href = 'profile.html';
+            }
+        });
+    }
 
     // Logout functionality
     const logoutLink = document.querySelector('.logout-link');
@@ -331,3 +347,24 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 });
+
+// Load profile data from localStorage
+function loadProfileData() {
+    const profileData = JSON.parse(localStorage.getItem('userProfile') || '{}');
+    
+    // Update profile picture
+    if (profileData.picture) {
+        const profileImages = document.querySelectorAll('.profile-img');
+        profileImages.forEach(img => {
+            img.src = profileData.picture;
+        });
+    }
+    
+    // Update profile name
+    if (profileData.name) {
+        const profileNames = document.querySelectorAll('.profile-name');
+        profileNames.forEach(el => {
+            el.textContent = profileData.name;
+        });
+    }
+}

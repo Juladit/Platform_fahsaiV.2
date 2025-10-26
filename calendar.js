@@ -1,4 +1,28 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Load profile data from localStorage (reuse dashboard.js function)
+    if (typeof loadProfileData === 'function') {
+        loadProfileData();
+    }
+    
+    // User profile click - navigate to profile page
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile) {
+        // Remove all existing listeners by cloning the element
+        const newUserProfile = userProfile.cloneNode(true);
+        userProfile.parentNode.replaceChild(newUserProfile, userProfile);
+        
+        newUserProfile.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Profile clicked from calendar, navigating to profile.html');
+            
+            // Don't navigate if we're already on the profile page
+            if (!window.location.pathname.includes('profile.html')) {
+                window.location.href = 'profile.html';
+            }
+        });
+    }
+
     const grid = document.getElementById('calendarGrid');
     const title = document.getElementById('calendarTitle');
     const prevBtn = document.getElementById('prevMonth');

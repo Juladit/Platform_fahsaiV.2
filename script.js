@@ -46,16 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Simulate login process (replace with actual authentication)
         setTimeout(() => {
-            // Reset button state
-            loginBtn.disabled = false;
-            loginBtn.textContent = 'Log in';
+            // Show success message
+            showMessage('Login successful! Redirecting...', 'success');
             
-            // For demo purposes, show success message
-            showMessage('Login successful! (Demo)', 'success');
-            
-            // In a real application, you would redirect or handle authentication here
-            // window.location.href = '/dashboard';
-        }, 1500);
+            // Redirect to dashboard after brief delay
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 800);
+        }, 1000);
     });
 
     // Input field animations
