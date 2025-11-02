@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import svgPaths from "../pages/svg-pfzv1oe4vh";
+import svgPaths from "../lib/svg-pfzv1oe4vh";
 
 export function Pagination() {
   const [currentPage, setCurrentPage] = useState(1);

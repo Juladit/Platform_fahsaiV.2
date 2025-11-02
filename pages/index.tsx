@@ -1,2 +1,2 @@
-// Adapted to render the FeedPage from the project instead of redirecting to /login
-export { default } from './FeedPage';
+// Start page: render the login page by default so users land on sign-in
+export { default } from './login';

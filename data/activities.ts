@@ -1,8 +1,7 @@
 import { Activity } from '../types';
-const placeholder = "/img/logo-mfu-v2.png";
-const imgImage1 = placeholder;
-const imgImage2 = placeholder;
-const imgImage3 = placeholder;
+
+// Use the same lightweight 1x1 GIF data URL for all mock images so the build doesn't require external assets.
+const PLACEHOLDER_DATA_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
 // Mock activity data - easy to edit!
 export const activities: Activity[] = [
@@ -12,7 +11,7 @@ export const activities: Activity[] = [
     date: "13/3/26",
     time: "1:30 PM",
     location: "Basketball court",
-    image: imgImage1,
+    image: PLACEHOLDER_DATA_URL,
     status: "registered"
   },
   {
@@ -21,7 +20,7 @@ export const activities: Activity[] = [
     date: "12/3/26",
     time: "1:30 PM",
     location: "MFU Outdoor stadium",
-    image: imgImage3,
+    image: PLACEHOLDER_DATA_URL,
     status: "open"
   },
   {
@@ -30,7 +29,7 @@ export const activities: Activity[] = [
     date: "12/3/26",
     time: "1:30 PM",
     location: "Some ajarn's house",
-    image: imgImage2,
+    image: PLACEHOLDER_DATA_URL,
     status: "registered"
   },
   {
@@ -39,7 +38,7 @@ export const activities: Activity[] = [
     date: "10/3/26",
     time: "1:30 PM",
     location: "Some ajarn's house",
-    image: imgImage2,
+    image: PLACEHOLDER_DATA_URL,
     status: "completed"
   }
 ];

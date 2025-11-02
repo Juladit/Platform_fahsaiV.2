@@ -1,91 +1,86 @@
 import type { Activity } from '../types';
-const placeholder = "/img/logo-mfu-v2.png";
-const imgCalendar = placeholder;
-const imgTimeMachine = placeholder;
-const imgPlaceMarker = placeholder;
+// Small 1x1 transparent GIF data URL used as a lightweight placeholder when no image is provided
+const PLACEHOLDER_DATA_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+
+
+// Small inline SVG icons (use className to size/color them via Tailwind)
+function CalendarSmall({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M3 10h18" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M8 2v4" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M16 2v4" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function TimeSmall({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.3" />
+      <path d="M12 7v6l4 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function PlaceSmall({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 21s-7-4.5-7-10a7 7 0 1 1 14 0c0 5.5-7 10-7 10z" stroke="currentColor" strokeWidth="1.3" fill="none" />
+      <circle cx="12" cy="11" r="2" fill="currentColor" />
+    </svg>
+  );
+}
 
 interface ActivityCardProps {
   activity: Activity;
 }
 
 export function ActivityCard({ activity }: ActivityCardProps) {
-  const getStatusStyles = () => {
-    switch (activity.status) {
-      case 'registered':
-        return {
-          bg: 'bg-[#b53231]',
-          text: 'Registered'
-        };
-      case 'open':
-        return {
-          bg: 'bg-[#33ad49]',
-          text: 'Open for Registration'
-        };
-      case 'completed':
-        return {
-          bg: 'bg-[#ffcd42]',
-          text: 'Completed'
-        };
-    }
-  };
+  const status = activity.status ?? '';
+  const statusText =
+    status === 'registered' ? 'Registered' : status === 'open' ? 'Open for Registration' : status === 'completed' ? 'Completed' : String(status);
 
-  // Ensure we always return a valid object to satisfy TypeScript
-  const getStatusStylesSafe = () => {
-    const s = getStatusStyles();
-    if (s) return s;
-    return { bg: 'bg-gray-400', text: String(activity.status ?? '') };
-  };
+  const statusBg =
+    status === 'registered' ? 'bg-[#b53231] text-white' : status === 'open' ? 'bg-[#33ad49] text-white' : status === 'completed' ? 'bg-[#ffcd42] text-black' : 'bg-gray-300 text-black';
 
-  const statusStyles = getStatusStylesSafe();
+  const mainImageSrc = (typeof activity.image === 'string' ? activity.image : activity.image?.src) ?? PLACEHOLDER_DATA_URL;
 
   return (
-    <div className="relative bg-white h-[227px] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] w-[301px]">
-      {/* Image */}
-      <div className="h-[142px] rounded-tl-[10px] rounded-tr-[10px] w-full overflow-hidden">
-        <img 
-          alt={activity.title} 
-          className="w-full h-full object-cover" 
-          src={activity.image} 
+    <article className="bg-white rounded-lg shadow overflow-hidden relative">
+      <div className="relative">
+        <img
+          src={mainImageSrc}
+          alt={activity.title}
+          className="w-full h-40 object-cover"
         />
+
+        {/* Status badge */}
+        <span className={`absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded-full ${statusBg}`}>
+          {statusText}
+        </span>
       </div>
 
-      {/* Status Badge */}
-      <div className={`${statusStyles.bg} h-[24px] absolute top-[5px] right-[6px] rounded-[100px] px-[8px] flex items-center justify-center`}>
-        <p className="font-['SF_Pro:Semibold',sans-serif] font-[590] text-[10px] text-white tracking-[-0.08px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-          {statusStyles.text}
-        </p>
-      </div>
+      <div className="p-4">
+        <h3 className="text-sm font-semibold text-black mb-1">{activity.title}</h3>
 
-      {/* Content */}
-      <div className="px-[16px] py-[9px]">
-        <p className="font-['SF_Pro:Semibold',sans-serif] font-[590] leading-[20px] text-[15px] text-black tracking-[-0.23px] mb-[4px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-          {activity.title}
-        </p>
-
-        {/* Date and Time */}
-        <div className="flex items-center gap-[58px] mb-[6px]">
-          <div className="flex items-center gap-[5px]">
-            <img alt="" className="opacity-50 size-[14px]" src={imgCalendar} />
-            <p className="font-['SF_Pro:Regular',sans-serif] font-normal leading-[16px] text-[#6f6f6f] text-[12px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              {activity.date}
-            </p>
+        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 mb-1">
+          <div className="flex items-center gap-2">
+            <CalendarSmall className="w-3 h-3 opacity-60 text-gray-500" />
+            <span>{activity.date}</span>
           </div>
-          <div className="flex items-center gap-[5px]">
-            <img alt="" className="opacity-50 size-[14px]" src={imgTimeMachine} />
-            <p className="font-['SF_Pro:Regular',sans-serif] font-normal leading-[16px] text-[#6f6f6f] text-[12px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-              {activity.time}
-            </p>
+          <div className="flex items-center gap-2">
+            <TimeSmall className="w-3 h-3 opacity-60 text-gray-500" />
+            <span>{activity.time}</span>
           </div>
         </div>
 
-        {/* Location */}
-        <div className="flex items-center gap-[5px]">
-          <img alt="" className="opacity-50 size-[14px]" src={imgPlaceMarker} />
-          <p className="font-['SF_Pro:Regular',sans-serif] font-normal leading-[16px] text-[#6f6f6f] text-[12px]" style={{ fontVariationSettings: "'wdth' 100" }}>
-            {activity.location}
-          </p>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <PlaceSmall className="w-3 h-3 opacity-60 text-gray-500" />
+          <span>{activity.location}</span>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

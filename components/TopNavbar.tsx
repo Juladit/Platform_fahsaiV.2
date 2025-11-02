@@ -1,12 +1,21 @@
-import svgPaths from "../pages/svg-pfzv1oe4vh";
-const placeholder = "/img/logo-mfu-v2.png";
-const imgImage5 = placeholder;
-const img = placeholder;
-const imgMenuIcon = placeholder;
+import svgPaths from "../lib/svg-pfzv1oe4vh";
+// Use a small inline placeholder data URL for logo/avatar to avoid requiring external PNG files
+const PLACEHOLDER_DATA_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+
+// Small hamburger icon used for the menu button (inline SVG so we don't rely on an external image)
+function HamburgerIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className ?? 'w-6 h-6'} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 6h18" stroke="#1E1E1E" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M3 12h18" stroke="#1E1E1E" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M3 18h18" stroke="#1E1E1E" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 function SearchIcon() {
   return (
-    <div className="size-[24px] ml-[6px] mt-px relative overflow-clip">
+    <div className="size-[26px] ml-[6px] mt-px relative overflow-clip">
       <div className="absolute bottom-[20.88%] left-1/4 right-[25.05%] top-[29.17%]">
         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
           <g>
@@ -37,19 +46,27 @@ interface TopNavbarProps {
 
 export function TopNavbar({ onMenuClick }: TopNavbarProps) {
   return (
-    <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-6 w-full shadow-sm">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      {/* EDITED: Fixed topbar wrapper - this is the container that keeps the top bar pinned to the top */}
+      <div className="h-14 px-4 flex items-center gap-6 w-full">
       {/* Menu Icon */}
       <button 
         onClick={onMenuClick}
         className="size-[28px] cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+        aria-label="Toggle menu"
       >
-  <img alt="Menu" className="size-full object-contain" src={imgMenuIcon} />
+        {/* EDITED: use inline SVG hamburger icon instead of external image */}
+        <HamburgerIcon className="w-6 h-6" />
       </button>
 
       {/* Logo */}
       <div className="flex items-center gap-2 shrink-0">
-        <div className="h-[36px] w-[39px]">
-          <img alt="" className="size-full object-cover" src={imgImage5} />
+        <div className="h-[50px] w-[39px] flex items-center justify-center bg-red-50 rounded-md">
+          {/* Inline SVG symbol */}
+          <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="#c80a0a" />
+            <text x="12" y="16" textAnchor="middle" fontSize="9" fill="#fff" fontFamily="Arial, Helvetica, sans-serif">MFU</text>
+          </svg>
         </div>
         <p className="font-['SF_Pro:Bold',sans-serif] font-bold leading-[28px] text-[#c80a0a] text-[22px] text-nowrap tracking-[-0.26px]" style={{ fontVariationSettings: "'wdth' 100" }}>
           <span>{`MFU `}</span>
@@ -77,10 +94,16 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
         <p className="font-['SF_Pro:Regular',sans-serif] font-normal leading-[20px] text-[15px] text-black text-nowrap tracking-[-0.23px]" style={{ fontVariationSettings: "'wdth' 100" }}>
           Miss Jane Doe
         </p>
-        <div className="overflow-clip rounded-full size-[36px]">
-          <img alt="" className="size-full object-cover" src={img} />
+        <div className="overflow-clip rounded-full size-[36px] bg-gray-100 flex items-center justify-center">
+          {/* small avatar circle */}
+          <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="8" r="3" fill="#c80a0a" />
+            <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="#e5e7eb" />
+          </svg>
         </div>
       </div>
+      </div>
+      {/* EDITED: End of fixed topbar wrapper */}
     </div>
   );
 }

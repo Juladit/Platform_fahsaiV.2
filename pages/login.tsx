@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
 
   function validate() {
     const e: { email?: string; password?: string } = {};
@@ -28,7 +30,13 @@ export default function LoginPage() {
     // Simulate a login request. Replace with real auth call.
     await new Promise((r) => setTimeout(r, 900));
     setLoading(false);
-    alert('Logged in (demo) — email: ' + email);
+    // Mark user as logged in (temporary client-side flag) and navigate to feed
+    try {
+      localStorage.setItem('isLoggedIn', 'true');
+    } catch (err) {
+      // localStorage may be unavailable in some environments; continue anyway
+    }
+    router.push('/FeedPage');
   }
 
   return (

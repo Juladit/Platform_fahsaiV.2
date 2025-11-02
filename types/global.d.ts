@@ -1,22 +1,17 @@
-// Allow importing figma assets and common image types in TypeScript
-declare module 'figma:asset/*' {
-  const src: string;
-  export default src;
-}
-
+// Allow importing common image types in TypeScript (we no longer use the Figma virtual scheme)
 declare module '*.png' {
-  const src: string;
-  export default src;
+  const value: { src: string; width?: number; height?: number; blurDataURL?: string };
+  export default value;
 }
 declare module '*.jpg' {
-  const src: string;
-  export default src;
+  const value: { src: string; width?: number; height?: number; blurDataURL?: string };
+  export default value;
 }
 declare module '*.jpeg' {
-  const src: string;
-  export default src;
+  const value: { src: string; width?: number; height?: number; blurDataURL?: string };
+  export default value;
 }
 declare module '*.svg' {
-  const src: string;
-  export default src;
+  const value: { src: string; width?: number; height?: number; blurDataURL?: string };
+  export default value;
 }
