@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Form submission handling
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const username = document.getElementById('username').value.trim();
@@ -44,16 +44,42 @@ document.addEventListener('DOMContentLoaded', function() {
         loginBtn.disabled = true;
         loginBtn.textContent = 'Logging in...';
         
-        // Simulate login process (replace with actual authentication)
-        setTimeout(() => {
-            // Show success message
-            showMessage('Login successful! Redirecting...', 'success');
-            
-            // Redirect to dashboard after brief delay
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 800);
-        }, 1000);
+        try {
+            // Call the backend API
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                // Store token and user data
+                localStorage.setItem('authToken', data.data.token);
+                localStorage.setItem('currentUser', JSON.stringify(data.data.user));
+                
+                // Show success message
+                showMessage('Login successful! Redirecting...', 'success');
+                
+                // Redirect to dashboard after brief delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 800);
+            } else {
+                // Show error message from server
+                showMessage(data.message || 'Invalid username or password', 'error');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Log in';
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            showMessage('Connection error. Make sure the server is running.', 'error');
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Log in';
+        }
     });
 
     // Input field animations

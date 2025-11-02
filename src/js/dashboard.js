@@ -1,13 +1,19 @@
 // Dashboard functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Load profile data from localStorage
-    loadProfileData();
+document.addEventListener('DOMContentLoaded', async function() {
+    // Check authentication
+    if (!isAuthenticated()) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Load user profile and activities
+    await loadUserProfile();
+    await loadActivities();
 
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const mobileOverlay = document.getElementById('mobileOverlay');
     const searchInput = document.querySelector('.search-input');
-    const activityCards = document.querySelectorAll('.activity-card');
     const paginationBtns = document.querySelectorAll('.pagination-btn, .page-number');
     const paginationContainer = document.querySelector('.pagination');
     const pageNumbersContainer = document.querySelector('.pagination-numbers');
@@ -35,13 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Search functionality
+    // Search functionality - will be re-attached after activities load
     searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase().trim();
+        const activityCards = document.querySelectorAll('.activity-card');
         
         activityCards.forEach(card => {
-            const title = card.querySelector('.card-title').textContent.toLowerCase();
-            const details = card.querySelector('.card-details').textContent.toLowerCase();
+            const title = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+            const details = card.querySelector('.card-details')?.textContent.toLowerCase() || '';
             
             if (title.includes(searchTerm) || details.includes(searchTerm)) {
                 card.style.display = 'block';
@@ -59,28 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Activity card interactions
-    activityCards.forEach(card => {
-        // Add hover effects
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-4px)';
-        });
-
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-
-        // Click to open calendar focused on this activity date
-        card.addEventListener('click', function() {
-            const date = this.getAttribute('data-date');
-            if (date) {
-                window.location.href = `calendar.html?date=${date}`;
-                return;
-            }
-            const title = this.querySelector('.card-title').textContent;
-            showMessage(`Viewing details for: ${title}`, 'info');
-        });
-    });
+    // Note: Activity card interactions are now handled in attachActivityCardListeners()
+    // after activities are loaded from the API
 
     // Navigation menu interactions
     const navLinks = document.querySelectorAll('.nav-link');
@@ -170,16 +157,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Logout functionality
     const logoutLink = document.querySelector('.logout-link');
-    logoutLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        if (confirm('Are you sure you want to log out?')) {
-            showMessage('Logging out...', 'info');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
-        }
-    });
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (confirm('Are you sure you want to log out?')) {
+                showMessage('Logging out...', 'info');
+                setTimeout(() => {
+                    logout(); // Use API logout function
+                }, 1000);
+            }
+        });
+    }
 
     // Simulate page loading
     function simulatePageLoad() {
@@ -348,23 +337,197 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(style);
 });
 
-// Load profile data from localStorage
-function loadProfileData() {
-    const profileData = JSON.parse(localStorage.getItem('userProfile') || '{}');
-    
-    // Update profile picture
-    if (profileData.picture) {
+// Load user profile from API
+async function loadUserProfile() {
+    try {
+        const currentUser = getCurrentUser();
+        if (!currentUser) {
+            logout();
+            return;
+        }
+
+        // Update profile picture and name in UI
         const profileImages = document.querySelectorAll('.profile-img');
-        profileImages.forEach(img => {
-            img.src = profileData.picture;
-        });
-    }
-    
-    // Update profile name
-    if (profileData.name) {
         const profileNames = document.querySelectorAll('.profile-name');
+        
+        profileImages.forEach(img => {
+            if (currentUser.avatar_url) {
+                img.src = currentUser.avatar_url;
+            }
+        });
+        
         profileNames.forEach(el => {
-            el.textContent = profileData.name;
+            el.textContent = currentUser.full_name || currentUser.username || 'User';
+        });
+
+    } catch (error) {
+        console.error('Error loading profile:', error);
+    }
+}
+
+// Load activities from API
+async function loadActivities() {
+    try {
+        const activityGrid = document.querySelector('.activity-grid');
+        if (!activityGrid) return;
+
+        // Show loading state
+        activityGrid.innerHTML = '<div class="loading-spinner">Loading activities...</div>';
+
+        const response = await API.activities.getAll();
+        
+        if (response && response.ok && response.data.success) {
+            const activities = response.data.data.activities;
+            
+            if (activities.length === 0) {
+                activityGrid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No activities available</h3>
+                        <p>Check back later for new activities!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Clear loading and render activities
+            activityGrid.innerHTML = '';
+            activities.forEach(activity => {
+                const card = createActivityCard(activity);
+                activityGrid.appendChild(card);
+            });
+
+            // Re-attach event listeners to new cards
+            attachActivityCardListeners();
+        } else {
+            activityGrid.innerHTML = `
+                <div class="error-state">
+                    <h3>Failed to load activities</h3>
+                    <p>Please try refreshing the page</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading activities:', error);
+        const activityGrid = document.querySelector('.activity-grid');
+        if (activityGrid) {
+            activityGrid.innerHTML = `
+                <div class="error-state">
+                    <h3>Connection error</h3>
+                    <p>Make sure the server is running</p>
+                </div>
+            `;
+        }
+    }
+}
+
+// Create activity card HTML
+function createActivityCard(activity) {
+    const card = document.createElement('div');
+    card.className = 'activity-card';
+    card.setAttribute('data-id', activity.id);
+    card.setAttribute('data-date', activity.event_date);
+
+    const eventDate = new Date(activity.event_date);
+    const formattedDate = eventDate.toLocaleDateString('en-GB');
+    const formattedTime = eventDate.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+    });
+
+    // Determine status tag
+    let statusTag = '';
+    const now = new Date();
+    const spotsLeft = activity.max_participants - activity.current_participants;
+    
+    if (eventDate < now) {
+        statusTag = '<div class="status-tag closed">Ended</div>';
+    } else if (spotsLeft <= 0) {
+        statusTag = '<div class="status-tag full">Full</div>';
+    } else if (spotsLeft <= 5) {
+        statusTag = '<div class="status-tag limited">Limited Spots</div>';
+    } else {
+        statusTag = '<div class="status-tag open">Open for Registration</div>';
+    }
+
+    card.innerHTML = `
+        <div class="card-image">
+            <img src="${activity.image_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=200&fit=crop'}" alt="${activity.title}">
+            ${statusTag}
+        </div>
+        <div class="card-content">
+            <h3 class="card-title">${activity.title}</h3>
+            <div class="card-details">
+                <div class="detail-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>${formattedDate}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-clock"></i>
+                    <span>${formattedTime}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${activity.location}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-users"></i>
+                    <span>${activity.current_participants}/${activity.max_participants}</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    return card;
+}
+
+// Attach event listeners to activity cards
+function attachActivityCardListeners() {
+    const activityCards = document.querySelectorAll('.activity-card');
+    
+    activityCards.forEach(card => {
+        // Add hover effects
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-4px)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+
+        // Click to view details or navigate to calendar
+        card.addEventListener('click', function() {
+            const date = this.getAttribute('data-date');
+            const activityId = this.getAttribute('data-id');
+            
+            if (date) {
+                window.location.href = `calendar.html?date=${date}&activity=${activityId}`;
+            }
+        });
+    });
+
+    // Update search functionality for dynamically loaded cards
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            activityCards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const details = card.querySelector('.card-details').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || details.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeIn 0.3s ease';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         });
     }
+}
+
+// Load profile data from localStorage (legacy function - keeping for compatibility)
+function loadProfileData() {
+    loadUserProfile();
 }
