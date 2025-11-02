@@ -39,7 +39,7 @@ export default function LoginPage() {
       <div className="max-w-lg w-full space-y-8">
         <form className="mt-8 space-y-6 card" onSubmit={onSubmit} noValidate>
           <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-red-500">Activity Board</h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-red-900">Activity Board</h2>
           <p className="mt-2 text-2xl text-black">Mea Fah Luang University</p>
         </div >
           <Input id="email" label="Email address" type="email" value={email} onChange={setEmail} placeholder="you@company.com" error={submitted ? errors.email : undefined} />
@@ -59,7 +59,7 @@ export default function LoginPage() {
           </div>
         </form>
 
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-md text-gray-600">
           Don’t have an account? <a href="#" className="text-indigo-600 hover:text-indigo-500 font-medium">Sign up</a>
         </p>
       </div>
