@@ -82,14 +82,23 @@ This will create:
 4. Add these policies:
 
    **Policy 1 - Public Read Access:**
-   - Template: Select "Allow public read access"
+   - Template: Select **"Allow access to JPG images in a public folder to anonymous users"**
    - Policy name: `Public avatar access`
+   - Modify the policy SQL to allow all image types (not just JPG):
+     - Change `storage."extension"(name) = 'jpg'` to `storage."extension"(name) IN ('jpg', 'jpeg', 'png', 'gif', 'webp')`
    - Click **"Review"** and **"Save policy"**
 
    **Policy 2 - Authenticated Upload:**
-   - Template: Select "Allow authenticated users to upload"
+   - Click **"New Policy"** again
+   - Template: Select **"Give users access to a folder only to authenticated users"**
    - Policy name: `Authenticated users can upload avatars`
+   - This will allow authenticated users to upload files
    - Click **"Review"** and **"Save policy"**
+
+   **Alternative: If you prefer simpler policies, you can:**
+   - Skip using templates and click **"Create policy from scratch"**
+   - For public read: Set `operation` to `SELECT`, leave `target roles` as `public`, check `WITH CHECK` to `true`
+   - For authenticated upload: Set `operation` to `INSERT`, set `target roles` to `authenticated`, check `WITH CHECK` to `auth.role() = 'authenticated'`
 
 ## Step 6: Configure Environment Variables
 
