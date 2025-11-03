@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { TopNavbar } from '../components/TopNavbar';
 import { ActivityCard } from '../components/ActivityCard';
 import { activities } from '../data/activities';
 import { Pagination } from '../components/Pagination';
+import { useRouter } from 'next/router';
 
 export default function FeedPage() {
   // EDITED: Sidebar default state set to closed (false) so sidebar is hidden on initial load
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+
+  const q = typeof router.query.q === 'string' ? router.query.q.trim().toLowerCase() : '';
+
+  const filtered = useMemo(() => {
+    if (!q) return activities;
+    return activities.filter((a) => {
+      const hay = `${a.title} ${a.location} ${a.date} ${a.time}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }, [q]);
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* EDITED: TopNavbar is fixed and placed above the Sidebar so it remains visible at the top */}
@@ -22,7 +34,7 @@ export default function FeedPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activities.map((a) => (
+            {filtered.map((a) => (
               <ActivityCard key={a.id} activity={a} />
             ))}
           </div>

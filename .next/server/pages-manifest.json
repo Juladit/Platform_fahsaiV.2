@@ -2,6 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/FeedPage": "pages/FeedPage.js",
+  "/activity/[id]": "pages/activity/[id].js",
   "/": "pages/index.js",
-  "/FeedPage": "pages/FeedPage.js"
+  "/my-activities": "pages/my-activities.js"
 }

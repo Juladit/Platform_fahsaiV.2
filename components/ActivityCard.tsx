@@ -1,4 +1,9 @@
 import type { Activity } from '../types';
+import { useRouter } from 'next/router';
+// Import bundled images from src to use as sensible defaults when activity data lacks images
+import basketballImg from '../src/basketball_image.png';
+import footballImg from '../src/Football_image.png';
+import archeryImg from '../src/Archery_image.png';
 // Small 1x1 transparent GIF data URL used as a lightweight placeholder when no image is provided
 const PLACEHOLDER_DATA_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
@@ -38,6 +43,7 @@ interface ActivityCardProps {
 }
 
 export function ActivityCard({ activity }: ActivityCardProps) {
+  const router = useRouter();
   const status = activity.status ?? '';
   const statusText =
     status === 'registered' ? 'Registered' : status === 'open' ? 'Open for Registration' : status === 'completed' ? 'Completed' : String(status);
@@ -45,10 +51,28 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   const statusBg =
     status === 'registered' ? 'bg-[#b53231] text-white' : status === 'open' ? 'bg-[#33ad49] text-white' : status === 'completed' ? 'bg-[#ffcd42] text-black' : 'bg-gray-300 text-black';
 
-  const mainImageSrc = (typeof activity.image === 'string' ? activity.image : activity.image?.src) ?? PLACEHOLDER_DATA_URL;
+  // Resolve image source:
+  // 1) activity.image can be a string path
+  // 2) or an imported image module (with .src)
+  // 3) otherwise pick a default based on the activity title
+  const resolvedFromActivity = typeof activity.image === 'string' ? activity.image : activity.image?.src;
+
+  const defaultByTitle: Record<string, { src?: string } | undefined> = {
+    'Annual Basketball Tournament': basketballImg,
+    'Football Tournament': footballImg,
+    'Archery activity': archeryImg,
+    'Archery activity first tournament': archeryImg,
+  };
+
+  const mainImageSrc = resolvedFromActivity ?? defaultByTitle[activity.title]?.src ?? PLACEHOLDER_DATA_URL;
 
   return (
-    <article className="bg-white rounded-lg shadow overflow-hidden relative">
+    <article
+      className="bg-white rounded-lg shadow overflow-hidden relative cursor-pointer"
+      onClick={() => router.push(`/activity/${activity.id}`)}
+      role="button"
+      aria-label={`Open details for ${activity.title}`}
+    >
       <div className="relative">
         <img
           src={mainImageSrc}

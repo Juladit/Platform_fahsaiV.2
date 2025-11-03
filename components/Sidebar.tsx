@@ -112,6 +112,8 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const router = useRouter();
+  const pathname = router.pathname;
+
   return (
     <>
       {/* Backdrop */}
@@ -140,18 +142,40 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Menu Items */}
         <div className="flex flex-col gap-[30px] mt-8 px-4">
-          <MenuItem icon={<StashFeed />} label="Feed" active />
-          <MenuItem 
-            icon={<CalendarIcon />} 
-            label="Calendar" 
+          <MenuItem
+            icon={<StashFeed />}
+            label="Feed"
+            active={pathname === '/FeedPage' || pathname === '/'}
+            onClick={() => {
+              onClose();
+              router.push('/FeedPage');
+            }}
           />
-          <MenuItem 
-            icon={<IxUserProfileFilled />} 
-            label="My Activities" 
+          <MenuItem
+            icon={<CalendarIcon />}
+            label="Calendar"
+            active={pathname === '/calendar'}
+            onClick={() => {
+              onClose();
+              router.push('/calendar');
+            }}
           />
-          <MenuItem 
-            icon={<QrCodeIcon />} 
-            label="Scan QR code" 
+          <MenuItem
+            icon={<IxUserProfileFilled />}
+            label="My Activities"
+            active={pathname === '/my-activities'}
+            onClick={() => {
+              onClose();
+              router.push('/my-activities');
+            }}
+          />
+          <MenuItem
+            icon={<QrCodeIcon />}
+            label="Scan QR code"
+            onClick={() => {
+              onClose();
+              router.push('/FeedPage');
+            }}
           />
         </div>
 

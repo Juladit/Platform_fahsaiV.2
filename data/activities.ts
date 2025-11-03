@@ -1,6 +1,12 @@
 import { Activity } from '../types';
 
-// Use the same lightweight 1x1 GIF data URL for all mock images so the build doesn't require external assets.
+// Import real image files from src (Option A) so webpack/Next bundles them and
+// components can access a stable `image.src` URL. Files already present in `src/`.
+import basketballImg from '../src/basketball_image.png';
+import footballImg from '../src/Football_image.png';
+import archeryImg from '../src/Archery_image.png';
+
+// Use the same lightweight 1x1 GIF data URL for fallback when needed.
 const PLACEHOLDER_DATA_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
 // Mock activity data - easy to edit!
@@ -11,7 +17,8 @@ export const activities: Activity[] = [
     date: "13/3/26",
     time: "1:30 PM",
     location: "Basketball court",
-    image: PLACEHOLDER_DATA_URL,
+    // set to imported module (ActivityCard will use .src)
+    image: basketballImg,
     status: "registered"
   },
   {
@@ -20,7 +27,7 @@ export const activities: Activity[] = [
     date: "12/3/26",
     time: "1:30 PM",
     location: "MFU Outdoor stadium",
-    image: PLACEHOLDER_DATA_URL,
+    image: footballImg,
     status: "open"
   },
   {
@@ -29,7 +36,7 @@ export const activities: Activity[] = [
     date: "12/3/26",
     time: "1:30 PM",
     location: "Some ajarn's house",
-    image: PLACEHOLDER_DATA_URL,
+    image: archeryImg,
     status: "registered"
   },
   {
@@ -38,7 +45,8 @@ export const activities: Activity[] = [
     date: "10/3/26",
     time: "1:30 PM",
     location: "Some ajarn's house",
-    image: PLACEHOLDER_DATA_URL,
+    // reuse archery image as a sensible default for this mock
+    image: archeryImg,
     status: "completed"
   }
 ];

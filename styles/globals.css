@@ -150,7 +150,7 @@ body {
   * {
     /* Use explicit border and outline styles with theme variables instead of
        non-existent Tailwind utilities like `border-border` and `outline-ring/50`. */
-    border: 1px solid var(--color-border);
+    /* removed global border to avoid borders on every element */
     outline: none;
   }
 

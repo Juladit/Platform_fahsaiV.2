@@ -1,4 +1,8 @@
 import svgPaths from "../lib/svg-pfzv1oe4vh";
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+// Logo image imported from src — this ensures the asset is bundled and provides a .src URL
+import logoImg from "../src/logo-mfu-v2.png";
 // Use a small inline placeholder data URL for logo/avatar to avoid requiring external PNG files
 const PLACEHOLDER_DATA_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
@@ -45,6 +49,19 @@ interface TopNavbarProps {
 }
 
 export function TopNavbar({ onMenuClick }: TopNavbarProps) {
+  const router = useRouter();
+  const [search, setSearch] = useState('');
+
+  // keep input in sync with query param when on FeedPage
+  useEffect(() => {
+    const q = typeof router.query.q === 'string' ? router.query.q : '';
+    setSearch(q);
+  }, [router.query.q]);
+
+  function submitSearch() {
+    const q = (search || '').trim();
+    router.push(`/FeedPage${q ? `?q=${encodeURIComponent(q)}` : ''}`);
+  }
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       {/* EDITED: Fixed topbar wrapper - this is the container that keeps the top bar pinned to the top */}
@@ -61,12 +78,14 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
 
       {/* Logo */}
       <div className="flex items-center gap-2 shrink-0">
-        <div className="h-[50px] w-[39px] flex items-center justify-center bg-red-50 rounded-md">
-          {/* Inline SVG symbol */}
+        <div className="h-[50px] w-[36px] flex items-center justify-center  rounded-md">
+          {/* Inline SVG symbol }
           <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="12" r="10" fill="#c80a0a" />
             <text x="12" y="16" textAnchor="middle" fontSize="9" fill="#fff" fontFamily="Arial, Helvetica, sans-serif">MFU</text>
-          </svg>
+          </svg>*/}
+          {/* Use imported image module's .src so Next/webpack resolves it even when not in public/ */}
+          <img src={logoImg?.src ?? PLACEHOLDER_DATA_URL} alt="Mae Fah Luang" />
         </div>
         <p className="font-['SF_Pro:Bold',sans-serif] font-bold leading-[28px] text-[#c80a0a] text-[22px] text-nowrap tracking-[-0.26px]" style={{ fontVariationSettings: "'wdth' 100" }}>
           <span>{`MFU `}</span>
@@ -76,16 +95,23 @@ export function TopNavbar({ onMenuClick }: TopNavbarProps) {
 
       {/* Search Bar */}
       <div className="flex-1 max-w-[400px] relative">
-        <div className="bg-white h-[28px] relative rounded-[50px] border border-[rgba(0,0,0,0.25)]">
+          <div className="bg-white h-[28px] relative rounded-[50px] border border-[rgba(0,0,0,0.25)]">
           <div className="absolute left-2 top-1/2 -translate-y-1/2">
             <SearchIcon />
           </div>
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submitSearch(); } }}
             placeholder="Find activities,clubs organizer..."
             className="w-full h-full bg-transparent font-['SF_Pro:Regular',sans-serif] font-normal text-[#898989] text-[12px] outline-none border-none pl-10 pr-4"
             style={{ fontVariationSettings: "'wdth' 100" }}
           />
+          {/* clicking the search icon should also submit */}
+          <button aria-label="search" onClick={submitSearch} className="absolute right-1 top-0 bottom-0 px-2">
+            <SearchIcon />
+          </button>
         </div>
       </div>
 
