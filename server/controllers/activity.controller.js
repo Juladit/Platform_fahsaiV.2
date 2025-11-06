@@ -9,6 +9,9 @@ const getAllActivities = async (req, res) => {
     try {
         const { status, search, limit = 50, offset = 0 } = req.query;
 
+        console.log('=== GET ALL ACTIVITIES ===');
+        console.log('Query params:', { status, search, limit, offset });
+
         let query = supabase
             .from('activities')
             .select(`
@@ -39,6 +42,9 @@ const getAllActivities = async (req, res) => {
             console.error('Get activities error:', error);
             return errorResponse(res, 'Failed to fetch activities', 500);
         }
+
+        console.log('Activities found:', activities ? activities.length : 0);
+        console.log('Activities data:', JSON.stringify(activities, null, 2));
 
         return successResponse(res, {
             activities,
@@ -92,12 +98,23 @@ const createActivity = async (req, res) => {
         const {
             title,
             description,
+            activity_type,
             activityType,
+            faculty,
             location,
+            start_date,
             startDate,
+            end_date,
             endDate,
+            max_participants,
             maxParticipants,
-            imageUrl
+            image_url,
+            imageUrl,
+            poster_url,
+            is_announcement_only,
+            registration_start_date,
+            registration_end_date,
+            status
         } = req.body;
 
         const { data: activity, error } = await supabase
@@ -105,14 +122,21 @@ const createActivity = async (req, res) => {
             .insert({
                 title,
                 description,
-                activity_type: activityType,
+                activity_type: activity_type || activityType,
+                faculty,
                 location,
-                start_date: startDate,
-                end_date: endDate,
-                max_participants: maxParticipants,
-                image_url: imageUrl,
+                start_date: start_date || startDate,
+                end_date: end_date || endDate,
+                max_participants: max_participants || maxParticipants,
+                image_url: image_url || imageUrl,
+                poster_url: poster_url || null,
+                is_announcement_only: is_announcement_only || false,
+                registration_start_date: registration_start_date || null,
+                registration_end_date: registration_end_date || null,
+                external_link: req.body.external_link || null,
                 created_by: req.user.id,
-                status: 'open'
+                status: status || 'open',
+                approval_status: 'pending'
             })
             .select()
             .single();
@@ -140,12 +164,22 @@ const updateActivity = async (req, res) => {
         const {
             title,
             description,
+            activity_type,
             activityType,
+            faculty,
             location,
+            start_date,
             startDate,
+            end_date,
             endDate,
+            max_participants,
             maxParticipants,
+            image_url,
             imageUrl,
+            poster_url,
+            is_announcement_only,
+            registration_start_date,
+            registration_end_date,
             status
         } = req.body;
 
@@ -163,12 +197,28 @@ const updateActivity = async (req, res) => {
         const updateData = {};
         if (title !== undefined) updateData.title = title;
         if (description !== undefined) updateData.description = description;
-        if (activityType !== undefined) updateData.activity_type = activityType;
+        if (activity_type !== undefined || activityType !== undefined) {
+            updateData.activity_type = activity_type || activityType;
+        }
+        if (faculty !== undefined) updateData.faculty = faculty;
         if (location !== undefined) updateData.location = location;
-        if (startDate !== undefined) updateData.start_date = startDate;
-        if (endDate !== undefined) updateData.end_date = endDate;
-        if (maxParticipants !== undefined) updateData.max_participants = maxParticipants;
-        if (imageUrl !== undefined) updateData.image_url = imageUrl;
+        if (start_date !== undefined || startDate !== undefined) {
+            updateData.start_date = start_date || startDate;
+        }
+        if (end_date !== undefined || endDate !== undefined) {
+            updateData.end_date = end_date || endDate;
+        }
+        if (max_participants !== undefined || maxParticipants !== undefined) {
+            updateData.max_participants = max_participants || maxParticipants;
+        }
+        if (image_url !== undefined || imageUrl !== undefined) {
+            updateData.image_url = image_url || imageUrl;
+        }
+        if (poster_url !== undefined) updateData.poster_url = poster_url;
+        if (is_announcement_only !== undefined) updateData.is_announcement_only = is_announcement_only;
+        if (registration_start_date !== undefined) updateData.registration_start_date = registration_start_date;
+        if (registration_end_date !== undefined) updateData.registration_end_date = registration_end_date;
+        if (req.body.external_link !== undefined) updateData.external_link = req.body.external_link;
         if (status !== undefined) updateData.status = status;
 
         const { data: activity, error } = await supabase
@@ -198,6 +248,22 @@ const updateActivity = async (req, res) => {
 const deleteActivity = async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Check if activity exists and get ownership info
+        const { data: existingActivity, error: fetchError } = await supabase
+            .from('activities')
+            .select('id, created_by, title')
+            .eq('id', id)
+            .single();
+
+        if (fetchError || !existingActivity) {
+            return errorResponse(res, 'Activity not found', 404);
+        }
+
+        // Check ownership (only creator or admin can delete)
+        if (existingActivity.created_by !== req.user.id && req.user.role !== 'admin') {
+            return errorResponse(res, 'You can only delete your own activities', 403);
+        }
 
         const { error } = await supabase
             .from('activities')

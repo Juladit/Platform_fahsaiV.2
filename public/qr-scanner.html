@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner - MFU Activity Board</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .scanner-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .scanner-header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .scanner-header h1 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .scanner-header p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .scanner-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .scanner-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .scanner-controls button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .stop-btn {
+            background: #e74c3c;
+            color: white;
+            display: none;
+        }
+
+        .stop-btn:hover {
+            background: #c0392b;
+        }
+
+        .back-btn {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .result-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-success {
+            border-left: 4px solid #27ae60;
+            background: #e8f8f0;
+        }
+
+        .result-error {
+            border-left: 4px solid #e74c3c;
+            background: #fadbd8;
+        }
+
+        .result-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .result-success h3 {
+            color: #27ae60;
+        }
+
+        .result-error h3 {
+            color: #e74c3c;
+        }
+
+        .result-box p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .attendance-info {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .attendance-info h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .camera-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .instructions {
+            background: #fff9e6;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h4 {
+            margin: 0 0 10px 0;
+            color: #d68910;
+            font-size: 16px;
+        }
+
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanner-container">
+        <div class="scanner-header">
+            <h1>📱 QR Code Scanner</h1>
+            <p>Scan event QR code to check in</p>
+        </div>
+
+        <div class="instructions">
+            <h4>📋 How to use:</h4>
+            <ul>
+                <li>Click "Start Scanner" to activate your camera</li>
+                <li>Point your camera at the event QR code</li>
+                <li>Wait for automatic detection and check-in</li>
+                <li>Make sure you're registered for the activity</li>
+            </ul>
+        </div>
+
+        <div class="result-box" id="resultBox"></div>
+
+        <div class="scanner-box">
+            <select class="camera-select" id="cameraSelect" style="display: none;">
+                <option value="">Select Camera...</option>
+            </select>
+            
+            <div id="reader"></div>
+            
+            <div class="scanner-controls">
+                <button class="start-btn" id="startBtn">Start Scanner</button>
+                <button class="stop-btn" id="stopBtn">Stop Scanner</button>
+                <button class="back-btn" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+            </div>
+        </div>
+
+        <div class="attendance-info" id="attendanceInfo" style="display: none;">
+            <h3>✅ Check-in Successful!</h3>
+            <div class="info-item">
+                <span class="info-label">Activity:</span>
+                <span class="info-value" id="activityName">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Event:</span>
+                <span class="info-value" id="eventTitle">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Date:</span>
+                <span class="info-value" id="eventDate">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Location:</span>
+                <span class="info-value" id="eventLocation">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Check-in Time:</span>
+                <span class="info-value" id="checkinTime">-</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="src/js/api.js"></script>
+    <script src="qr-scanner.js"></script>
+</body>
+</html>

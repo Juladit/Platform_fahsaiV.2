@@ -5,7 +5,8 @@ const {
     getUserRegistrations,
     registerForActivity,
     cancelRegistration,
-    getActivityRegistrations
+    getActivityRegistrations,
+    removeParticipant
 } = require('../controllers/registration.controller');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const { validate } = require('../middleware/validator.middleware');
@@ -60,11 +61,26 @@ router.get(
     '/activity/:activityId',
     [
         authMiddleware,
-        adminMiddleware,
+        // adminMiddleware removed - organizers can view their own activity participants
         param('activityId').isUUID().withMessage('Invalid activity ID'),
         validate
     ],
     getActivityRegistrations
+);
+
+/**
+ * @route   DELETE /api/registrations/:id/remove
+ * @desc    Remove a participant from an activity (Organizer/Admin only)
+ * @access  Private (Admin/Organizer only)
+ */
+router.delete(
+    '/:id/remove',
+    [
+        authMiddleware,
+        param('id').isUUID().withMessage('Invalid registration ID'),
+        validate
+    ],
+    removeParticipant
 );
 
 module.exports = router;

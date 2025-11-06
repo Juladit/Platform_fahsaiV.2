@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Activities - MFU Activity Board</title>
+    <link rel="stylesheet" href="src/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        // Set user role immediately to prevent flickering
+        (function() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.documentElement.setAttribute('data-user-role', userData.role || 'student');
+            }
+        })();
+    </script>
+    <style>
+        .tabs-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: #dc2626;
+            border-bottom-color: #dc2626;
+        }
+
+        .tab:hover:not(.active) {
+            color: #334155;
+        }
+
+        .tab-content {
+            display: none;
+            padding-top: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .activity-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid #f1f5f9;
+            position: relative;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+
+        .card-image {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .activity-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #dc2626 0%, #f59e0b 100%);
+        }
+
+        .activity-content {
+            padding: 1.25rem;
+        }
+
+        .activity-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .activity-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .meta-item i {
+            width: 16px;
+            color: #94a3b8;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-registered {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .activity-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .btn {
+            padding: 0.625rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #b91c1c;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    <aside class="sidebar open" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo-text">MFU</div>
+                <span class="brand-text">Activity Board</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <i class="fas fa-list"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="my-activities.html" class="nav-link">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>My Activities</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="calendar.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="qr-scanner.html" class="nav-link">
+                        <i class="fas fa-qrcode"></i>
+                        <span>QR Scanner</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="createActivityNav" data-role="organizer,admin">
+                    <a href="activity-form.html" class="nav-link">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Create Activity</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="adminNav" data-role="admin">
+                    <a href="admin-approval.html" class="nav-link">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="logout-link" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Log out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-logo">
+                    <div class="flame-icon"></div>
+                    <span class="header-brand">MFU Activity Board</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Search activities..." class="search-input" id="searchInput">
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge" style="display:none;">0</span>
+                </button>
+                <div class="user-profile" id="userProfileBtn" style="cursor:pointer;">
+                    <img id="headerProfileImg" src="" alt="Profile" class="profile-img">
+                    <span id="headerProfileName" class="profile-name">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Dropdown -->
+        <div class="notification-dropdown" id="notificationDropdown">
+            <div class="notification-header">
+                <h3>Notifications</h3>
+                <button class="mark-all-read-btn" id="markAllReadBtn">Mark all as read</button>
+            </div>
+            <div class="notification-list" id="notificationList">
+                <div style="text-align:center;padding:20px;color:#9ca3af;">
+                    <i class="fas fa-bell-slash" style="font-size:24px;"></i>
+                    <p style="margin-top:10px;">No notifications</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="content-header">
+                <h1 class="page-title">My Activities</h1>
+            </div>
+        <div class="content-body">
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab active" data-tab="created">
+                        <i class="fas fa-plus-circle"></i> Created by Me
+                    </button>
+                    <button class="tab" data-tab="registered">
+                        <i class="fas fa-check-circle"></i> Registered Activities
+                    </button>
+                </div>
+
+                <!-- Created Activities Tab -->
+                <div class="tab-content active" id="created-tab">
+                    <div id="created-loading" class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading your created activities...</p>
+                    </div>
+                    <div id="created-activities" class="activities-grid"></div>
+                    <div id="created-empty" class="empty-state" style="display: none;">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>No Activities Created Yet</h3>
+                        <p>Start by creating your first activity!</p>
+                    </div>
+                </div>
+
+                <!-- Registered Activities Tab -->
+                <div class="tab-content" id="registered-tab">
+                    <div id="registered-loading" class="loading" style="display: none;">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading your registered activities...</p>
+                    </div>
+                    <div id="registered-activities" class="activities-grid"></div>
+                    <div id="registered-empty" class="empty-state" style="display: none;">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>No Registered Activities</h3>
+                        <p>Browse the dashboard to find activities to join!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+
+    <script src="src/js/api.js"></script>
+    <script src="src/js/notifications.js"></script>
+    <script>
+        // Check authentication
+        async function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            
+            try {
+                const response = await API.auth.getMe();
+                console.log('Get me response:', response);
+                
+                // Handle different response formats
+                if (response && response.user) {
+                    currentUser = response.user;
+                } else if (response && response.data && response.data.user) {
+                    currentUser = response.data.user;
+                } else if (response && response.data && response.data.data && response.data.data.user) {
+                    currentUser = response.data.data.user;
+                } else {
+                    // If API call failed, try to get user from localStorage
+                    const storedUser = localStorage.getItem('currentUser');
+                    if (storedUser) {
+                        currentUser = JSON.parse(storedUser);
+                    } else {
+                        console.error('Could not get user from API or localStorage');
+                        return false;
+                    }
+                }
+                
+                updateProfile();
+                setupNavigation();
+                return true;
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                // Don't redirect on error, try to use cached user
+                const storedUser = localStorage.getItem('currentUser');
+                if (storedUser) {
+                    currentUser = JSON.parse(storedUser);
+                    updateProfile();
+                    setupNavigation();
+                    return true;
+                }
+                localStorage.removeItem('authToken');
+                window.location.href = 'index.html';
+                return false;
+            }
+        }
+
+        // Update profile display
+        function updateProfile() {
+            const fullName = `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || currentUser.username;
+            document.getElementById('headerProfileName').textContent = fullName;
+            
+            const img = document.getElementById('headerProfileImg');
+            if (currentUser.avatar_url) {
+                img.src = currentUser.avatar_url;
+            } else {
+                const initials = fullName.split(' ').map(n => n[0]).join('');
+                img.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(initials) + '&background=667eea&color=fff&size=40';
+            }
+        }
+
+        // Setup navigation based on role
+        function setupNavigation() {
+            // Set user role on body element for CSS-based nav visibility
+            document.body.setAttribute('data-user-role', currentUser.role || 'student');
+        }
+
+        // Tab switching
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const tabName = tab.dataset.tab;
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                    
+                    if (tabName === 'registered' && !document.getElementById('registered-activities').hasChildNodes()) {
+                        loadRegisteredActivities();
+                    }
+                });
+            });
+        }
+
+        // Load created activities
+        async function loadCreatedActivities() {
+            const container = document.getElementById('created-activities');
+            const loading = document.getElementById('created-loading');
+            const empty = document.getElementById('created-empty');
+            
+            loading.style.display = 'block';
+            container.innerHTML = '';
+            empty.style.display = 'none';
+            
+            try {
+                const response = await API.activities.getAll();
+                console.log('All activities response:', response);
+                
+                // API client returns { ok: true, data: { success, data: { activities } } }
+                let activities = [];
+                if (response && response.ok && response.data && response.data.data && response.data.data.activities) {
+                    activities = response.data.data.activities;
+                } else if (Array.isArray(response)) {
+                    activities = response;
+                } else if (response && response.activities) {
+                    activities = response.activities;
+                } else if (response && response.data && Array.isArray(response.data)) {
+                    activities = response.data;
+                }
+                
+                console.log('Parsed activities:', activities);
+                
+                // Filter activities created by current user - show ALL statuses (pending, approved, rejected)
+                const myActivities = activities.filter(a => a.created_by === currentUser.id);
+                console.log('My activities (created by user):', myActivities);
+                
+                loading.style.display = 'none';
+                
+                if (myActivities.length === 0) {
+                    empty.style.display = 'block';
+                    return;
+                }
+                
+                myActivities.forEach(activity => {
+                    container.appendChild(createActivityCard(activity, 'created'));
+                });
+            } catch (error) {
+                console.error('Error loading created activities:', error);
+                loading.style.display = 'none';
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Error Loading Activities</h3><p>' + error.message + '</p></div>';
+            }
+        }
+
+        // Load registered activities
+        async function loadRegisteredActivities() {
+            const container = document.getElementById('registered-activities');
+            const loading = document.getElementById('registered-loading');
+            const empty = document.getElementById('registered-empty');
+            
+            loading.style.display = 'block';
+            container.innerHTML = '';
+            empty.style.display = 'none';
+            
+            try {
+                const response = await API.registrations.getMyRegistrations();
+                console.log('Registrations response:', response);
+                
+                // API client returns { ok: true, data: { success, data: { registrations } } }
+                let registrations = [];
+                if (response && response.ok && response.data && response.data.data && response.data.data.registrations) {
+                    registrations = response.data.data.registrations;
+                } else if (Array.isArray(response)) {
+                    registrations = response;
+                } else if (response && response.registrations) {
+                    registrations = response.registrations;
+                } else if (response && response.data && Array.isArray(response.data)) {
+                    registrations = response.data;
+                }
+                
+                console.log('Parsed registrations:', registrations);
+                
+                loading.style.display = 'none';
+                
+                if (registrations.length === 0) {
+                    empty.style.display = 'block';
+                    return;
+                }
+                
+                for (const reg of registrations) {
+                    if (reg.registration_status === 'registered') {
+                        // Registration already includes the activity data
+                        if (reg.activity) {
+                            container.appendChild(createActivityCard(reg.activity, 'registered', reg));
+                        } else {
+                            // Fallback: fetch activity separately if not included
+                            try {
+                                const activityResponse = await API.activities.getById(reg.activity_id);
+                                // Handle activity response format
+                                let activity = null;
+                                if (activityResponse && activityResponse.ok && activityResponse.data && activityResponse.data.data) {
+                                    activity = activityResponse.data.data.activity || activityResponse.data.data;
+                                } else if (activityResponse && activityResponse.activity) {
+                                    activity = activityResponse.activity;
+                                } else if (activityResponse && activityResponse.data) {
+                                    activity = activityResponse.data;
+                                }
+                                
+                                if (activity) {
+                                    container.appendChild(createActivityCard(activity, 'registered', reg));
+                                }
+                            } catch (err) {
+                                console.error('Error loading activity:', reg.activity_id, err);
+                            }
+                        }
+                    }
+                }
+                
+                if (!container.hasChildNodes()) {
+                    empty.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading registered activities:', error);
+                loading.style.display = 'none';
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Error Loading Activities</h3><p>' + error.message + '</p></div>';
+            }
+        }
+
+        // Create activity card
+        function createActivityCard(activity, type, registration = null) {
+            const card = document.createElement('div');
+            card.className = 'activity-card';
+            
+            const statusClass = type === 'created' 
+                ? `status-${activity.approval_status}` 
+                : 'status-registered';
+            const statusText = type === 'created' 
+                ? activity.approval_status 
+                : 'Registered';
+            
+            const startDate = new Date(activity.start_date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            // Use poster if available, otherwise fallback to image_url or default
+            const posterUrl = activity.poster_url || activity.image_url || null;
+            
+            card.innerHTML = `
+                ${posterUrl ? 
+                    `<img src="${posterUrl}" alt="${activity.title}" class="activity-image">` :
+                    `<div class="activity-image"></div>`
+                }
+                <div class="activity-content">
+                    <div class="activity-title">${activity.title}</div>
+                    <div class="activity-meta">
+                        <div class="meta-item">
+                            <i class="far fa-calendar"></i>
+                            <span>${startDate}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${activity.location || 'TBA'}</span>
+                        </div>
+                        ${activity.faculty ? `
+                            <div class="meta-item">
+                                <i class="fas fa-university"></i>
+                                <span>${activity.faculty}</span>
+                            </div>
+                        ` : ''}
+                        <div class="meta-item">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                    </div>
+                    ${activity.external_link ? `
+                        <div style="margin-top: 10px;">
+                            <a href="${activity.external_link}" target="_blank" rel="noopener noreferrer" class="btn btn-link" style="width: 100%; text-align: center; padding: 8px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                                <i class="fas fa-external-link-alt"></i> Learn More
+                            </a>
+                        </div>
+                    ` : ''}
+                    <div class="activity-actions">
+                        ${type === 'created' ? `
+                            <button class="btn btn-info" onclick="window.location.href='activity-details.html?id=${activity.id}'">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-warning" onclick="editActivity('${activity.id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteActivity('${activity.id}', '${activity.title.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        ` : `
+                            <button class="btn btn-primary" onclick="window.location.href='activity-details.html?id=${activity.id}'">
+                                <i class="fas fa-eye"></i> Details
+                            </button>
+                            <button class="btn btn-danger" onclick="cancelRegistration('${activity.id}')">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Delete activity (organizer only)
+        window.deleteActivity = async function(activityId, activityTitle) {
+            if (currentUser.role !== 'organizer' && currentUser.role !== 'admin') {
+                alert('Only organizers can delete their own activities');
+                return;
+            }
+            
+            const confirmed = confirm(`Are you sure you want to delete "${activityTitle}"?\n\nThis will:\n- Delete the activity\n- Cancel all registrations\n- Delete all events\n- Remove all related data\n\nThis action cannot be undone!`);
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            try {
+                const response = await API.activities.delete(activityId);
+                
+                if (response.ok) {
+                    alert('Activity deleted successfully');
+                    // Reload activities
+                    loadCreatedActivities();
+                } else {
+                    throw new Error(response.data?.message || 'Failed to delete activity');
+                }
+            } catch (error) {
+                console.error('Delete activity error:', error);
+                alert('Failed to delete activity: ' + error.message);
+            }
+        };
+
+        // Edit activity
+        window.editActivity = function(activityId) {
+            window.location.href = `activity-form.html?id=${activityId}`;
+        };
+
+        // Cancel registration
+        window.cancelRegistration = async function(activityId) {
+            if (!confirm('Are you sure you want to cancel your registration?')) {
+                return;
+            }
+            
+            try {
+                const registrations = await API.registrations.getMyRegistrations();
+                const registration = registrations.find(r => r.activity_id === activityId);
+                
+                if (registration) {
+                    await API.registrations.cancel(registration.id);
+                    alert('Registration cancelled successfully');
+                    loadRegisteredActivities();
+                }
+            } catch (error) {
+                console.error('Error cancelling registration:', error);
+                alert('Failed to cancel registration');
+            }
+        };
+
+        // Profile button - navigate to profile page
+        document.getElementById('userProfileBtn').addEventListener('click', function() {
+            window.location.href = 'profile.html';
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('authToken');
+            window.location.href = 'index.html';
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                mobileOverlay.classList.toggle('show');
+            });
+        }
+
+        if (mobileOverlay) {
+            mobileOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                mobileOverlay.classList.remove('show');
+            });
+        }
+
+        // Initialize
+        async function init() {
+            const authenticated = await checkAuth();
+            if (authenticated) {
+                setupTabs();
+                loadCreatedActivities();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

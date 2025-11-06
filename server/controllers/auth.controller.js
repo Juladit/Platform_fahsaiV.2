@@ -8,17 +8,41 @@ const { generateToken, successResponse, errorResponse } = require('../utils/help
  */
 const register = async (req, res) => {
     try {
-        const { username, email, password, firstName, lastName, phone } = req.body;
+        const { username, email, password, firstName, lastName, phone, studentId, role } = req.body;
 
-        // Check if user already exists
-        const { data: existingUser } = await supabase
+        // Check username
+        const { data: existingUsername } = await supabase
             .from('users')
             .select('id')
-            .or(`username.eq.${username},email.eq.${email}`)
+            .eq('username', username)
             .single();
 
-        if (existingUser) {
-            return errorResponse(res, 'Username or email already exists', 400);
+        if (existingUsername) {
+            return errorResponse(res, 'Username already exists', 400);
+        }
+
+        // Check email
+        const { data: existingEmail } = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .single();
+
+        if (existingEmail) {
+            return errorResponse(res, 'Email already exists', 400);
+        }
+
+        // Check student ID if provided
+        if (studentId) {
+            const { data: existingStudentId } = await supabase
+                .from('users')
+                .select('id')
+                .eq('student_id', studentId)
+                .single();
+
+            if (existingStudentId) {
+                return errorResponse(res, 'Student ID already exists', 400);
+            }
         }
 
         // Hash password
@@ -34,9 +58,10 @@ const register = async (req, res) => {
                 first_name: firstName,
                 last_name: lastName,
                 phone,
-                role: 'student' // Default role
+                student_id: studentId,
+                role: role || 'student' // Use provided role or default to 'student'
             })
-            .select('id, username, email, first_name, last_name, role, avatar_url, created_at')
+            .select('id, username, email, first_name, last_name, student_id, role, avatar_url, created_at')
             .single();
 
         if (error) {

@@ -3,15 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MFU Activity Board - Calendar</title>
+    <title>Calendar - MFU Activity Board</title>
     <link rel="stylesheet" href="src/css/dashboard.css">
     <link rel="stylesheet" href="src/css/calendar.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        // Set user role immediately to prevent flickering
+        (function() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.documentElement.setAttribute('data-user-role', userData.role || 'student');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="mobile-overlay" id="mobileOverlay"></div>
-
     <aside class="sidebar open" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
@@ -24,31 +33,50 @@
                 <li class="nav-item">
                     <a href="dashboard.html" class="nav-link">
                         <i class="fas fa-list"></i>
-                        <span>Feed</span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="my-activities.html" class="nav-link">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>My Activities</span>
                     </a>
                 </li>
                 <li class="nav-item active">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-calendar"></i>
+                    <a href="calendar.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
                         <span>Calendar</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-user"></i>
-                        <span>My Activities</span>
+                    <a href="qr-scanner.html" class="nav-link">
+                        <i class="fas fa-qrcode"></i>
+                        <span>QR Scanner</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="createActivityNav" data-role="organizer,admin">
+                    <a href="activity-form.html" class="nav-link">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Create Activity</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="adminNav" data-role="admin">
+                    <a href="admin-approval.html" class="nav-link">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Admin Panel</span>
                     </a>
                 </li>
             </ul>
         </nav>
         <div class="sidebar-footer">
-            <a href="index.html" class="logout-link">
+            <a href="#" class="logout-link" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Log out</span>
             </a>
         </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="main-content">
         <header class="top-header">
             <div class="header-left">
@@ -56,57 +84,107 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="header-logo">
-                    <div class="flame-icon">🔥</div>
+                    <div class="flame-icon"></div>
                     <span class="header-brand">MFU Activity Board</span>
                 </div>
             </div>
             <div class="header-center">
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" placeholder="Find activities, clubs organizer..." class="search-input">
+                    <input type="text" placeholder="Search events..." class="search-input" id="searchInput">
                 </div>
             </div>
             <div class="header-right">
-                <div class="user-profile" id="userProfile">
-                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face" alt="Profile" class="profile-img">
-                    <span class="profile-name">Miss Jane Doe</span>
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge" style="display:none;">0</span>
+                </button>
+                <div class="user-profile" id="userProfileBtn" style="cursor:pointer;">
+                    <img id="headerProfileImg" src="" alt="Profile" class="profile-img">
+                    <span id="headerProfileName" class="profile-name">Loading...</span>
                 </div>
             </div>
         </header>
 
-        <div class="content-area">
-            <div class="content-header">
-                <h1 class="page-title">Calendar</h1>
+        <!-- Notification Dropdown -->
+        <div class="notification-dropdown" id="notificationDropdown">
+            <div class="notification-header">
+                <h3>Notifications</h3>
+                <button class="mark-all-read-btn" id="markAllReadBtn">Mark all as read</button>
             </div>
-
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <button class="cal-btn" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                    <div class="calendar-title" id="calendarTitle">October 2025</div>
-                    <button class="cal-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
-                </div>
-
-                <div class="calendar-grid" id="calendarGrid">
-                    <!-- Weekday headers -->
-                    <div class="weekday">Mo</div>
-                    <div class="weekday">Tu</div>
-                    <div class="weekday">We</div>
-                    <div class="weekday">Th</div>
-                    <div class="weekday">Fr</div>
-                    <div class="weekday weekend">Sa</div>
-                    <div class="weekday weekend">Su</div>
-                    <!-- Days will be injected by JS -->
-                </div>
-                <div class="calendar-legend">
-                    <span class="legend-item"><span class="badge badge-registered"></span> Registered</span>
-                    <span class="legend-item"><span class="badge badge-open"></span> Open</span>
-                    <span class="legend-item"><span class="badge badge-completed"></span> Completed</span>
+            <div class="notification-list" id="notificationList">
+                <div style="text-align:center;padding:20px;color:#9ca3af;">
+                    <i class="fas fa-bell-slash" style="font-size:24px;"></i>
+                    <p style="margin-top:10px;">No notifications</p>
                 </div>
             </div>
         </div>
+
+        <div class="content-area">
+            <div class="content-header">
+                <h1 class="page-title">📅 Event Calendar</h1>
+            </div>
+
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button class="month-nav-btn" id="prevMonth">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h2 class="calendar-title" id="calendarTitle">November 2025</h2>
+                <button class="month-nav-btn" id="nextMonth">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="today-btn" id="todayBtn">Today</button>
+            </div>
+
+            <div class="calendar-legend">
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: #dc2626;"></span>
+                    <span>Events</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-indicator">1-3 dots = 1-3 events</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-indicator">Click date to see all events</span>
+                </div>
+            </div>
+
+            <div class="calendar-grid">
+                <div class="calendar-weekdays">
+                    <div class="weekday">Sun</div>
+                    <div class="weekday">Mon</div>
+                    <div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div>
+                    <div class="weekday">Thu</div>
+                    <div class="weekday">Fri</div>
+                    <div class="weekday">Sat</div>
+                </div>
+                <div class="calendar-days" id="calendarDays">
+                    <!-- Days will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        </div>
     </main>
 
-    <script src="src/js/dashboard.js"></script>
-    <script src="src/js/calendar.js"></script>
+    <!-- Event Details Modal -->
+    <div id="eventModal" class="event-modal">
+        <div class="event-modal-content">
+            <div class="event-modal-header">
+                <h3 id="modalDate">Events for November 4, 2025</h3>
+                <button class="btn-close-modal" onclick="closeEventModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="event-modal-body" id="modalEventsList">
+                <!-- Events will be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="src/js/api.js"></script>
+    <script src="src/js/notifications.js"></script>
+    <script src="calendar.js"></script>
 </body>
 </html>

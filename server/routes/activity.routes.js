@@ -8,7 +8,7 @@ const {
     updateActivity,
     deleteActivity
 } = require('../controllers/activity.controller');
-const { authMiddleware, adminMiddleware, optionalAuth } = require('../middleware/auth.middleware');
+const { authMiddleware, adminMiddleware, optionalAuth, requireRole } = require('../middleware/auth.middleware');
 const { validate } = require('../middleware/validator.middleware');
 
 /**
@@ -57,21 +57,37 @@ router.post(
             .trim()
             .isLength({ max: 50 })
             .withMessage('Activity type must not exceed 50 characters'),
+        body('activity_type')
+            .optional()
+            .trim()
+            .isLength({ max: 50 })
+            .withMessage('Activity type must not exceed 50 characters'),
         body('location')
             .optional()
             .trim()
             .isLength({ max: 255 })
             .withMessage('Location must not exceed 255 characters'),
         body('startDate')
-            .notEmpty()
-            .withMessage('Start date is required')
+            .optional()
+            .isISO8601()
+            .withMessage('Invalid start date format'),
+        body('start_date')
+            .optional()
             .isISO8601()
             .withMessage('Invalid start date format'),
         body('endDate')
             .optional()
             .isISO8601()
             .withMessage('Invalid end date format'),
+        body('end_date')
+            .optional()
+            .isISO8601()
+            .withMessage('Invalid end date format'),
         body('maxParticipants')
+            .optional()
+            .isInt({ min: 1 })
+            .withMessage('Max participants must be a positive integer'),
+        body('max_participants')
             .optional()
             .isInt({ min: 1 })
             .withMessage('Max participants must be a positive integer'),
@@ -80,6 +96,9 @@ router.post(
             .trim()
             .isURL()
             .withMessage('Invalid image URL'),
+        body('image_url')
+            .optional()
+            .trim(),
         validate
     ],
     createActivity
@@ -109,6 +128,11 @@ router.put(
             .trim()
             .isLength({ max: 50 })
             .withMessage('Activity type must not exceed 50 characters'),
+        body('activity_type')
+            .optional()
+            .trim()
+            .isLength({ max: 50 })
+            .withMessage('Activity type must not exceed 50 characters'),
         body('location')
             .optional()
             .trim()
@@ -118,7 +142,15 @@ router.put(
             .optional()
             .isISO8601()
             .withMessage('Invalid start date format'),
+        body('start_date')
+            .optional()
+            .isISO8601()
+            .withMessage('Invalid start date format'),
         body('endDate')
+            .optional()
+            .isISO8601()
+            .withMessage('Invalid end date format'),
+        body('end_date')
             .optional()
             .isISO8601()
             .withMessage('Invalid end date format'),
@@ -126,7 +158,14 @@ router.put(
             .optional()
             .isInt({ min: 1 })
             .withMessage('Max participants must be a positive integer'),
+        body('max_participants')
+            .optional()
+            .isInt({ min: 1 })
+            .withMessage('Max participants must be a positive integer'),
         body('imageUrl')
+            .optional()
+            .trim(),
+        body('image_url')
             .optional()
             .trim(),
         body('status')
@@ -140,14 +179,14 @@ router.put(
 
 /**
  * @route   DELETE /api/activities/:id
- * @desc    Delete activity
+ * @desc    Delete activity (organizer can delete own, admin can delete any)
  * @access  Private (Admin/Organizer only)
  */
 router.delete(
     '/:id',
     [
         authMiddleware,
-        adminMiddleware,
+        requireRole('admin', 'organizer'),
         param('id').isUUID().withMessage('Invalid activity ID'),
         validate
     ],

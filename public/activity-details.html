@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Details - MFU Activity Board</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+    <link rel="stylesheet" href="src/css/event-management.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        .activity-header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .activity-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+
+        .activity-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-open {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-full {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-closed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .activity-description {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .info-card h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .events-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .events-section h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .event-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .event-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .event-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .event-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .event-detail {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .attendance-stats {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .attendance-stats h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .stat-bars {
+            margin-top: 20px;
+        }
+
+        .stat-bar {
+            margin-bottom: 15px;
+        }
+
+        .stat-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .stat-bar-fill {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .stat-bar-progress {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Notification Toggle */
+        .notification-toggle-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .notification-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .notification-toggle input[type="checkbox"] {
+            display: none;
+        }
+
+        .toggle-slider {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 24px;
+            transition: background 0.3s;
+        }
+
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .notification-toggle input:checked + .toggle-slider {
+            background: #667eea;
+        }
+
+        .notification-toggle input:checked + .toggle-slider::after {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .toggle-label i {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .activity-header {
+                padding: 20px;
+            }
+
+            .activity-title {
+                font-size: 24px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="dashboard.html" class="back-button">
+            ← Back to Dashboard
+        </a>
+
+        <div id="alertContainer"></div>
+
+        <div id="loadingState" class="loading">
+            <p>Loading activity details...</p>
+        </div>
+
+        <div id="contentContainer" style="display: none;">
+            <div class="activity-header">
+                <!-- Poster image section -->
+                <div id="activityPosterContainer" style="display: none; margin-bottom: 30px;">
+                    <img id="activityPoster" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" alt="Activity Poster">
+                </div>
+
+                <h1 class="activity-title" id="activityTitle">-</h1>
+                
+                <div class="activity-meta">
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span id="activityDates">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📍</span>
+                        <span id="activityLocation">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>👥</span>
+                        <span id="activityParticipants">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span id="statusBadge" class="status-badge">-</span>
+                    </div>
+                </div>
+
+                <div class="activity-description" id="activityDescription">-</div>
+
+                <div class="action-buttons" id="actionButtons">
+                    <!-- Dynamic buttons will be inserted here -->
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>📋 Activity Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Type</span>
+                        <span class="info-value" id="activityType">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Faculty</span>
+                        <span class="info-value" id="activityFaculty">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Created by</span>
+                        <span class="info-value" id="activityCreator">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Max Participants</span>
+                        <span class="info-value" id="maxParticipants">-</span>
+                    </div>
+                </div>
+
+                <div class="info-card" id="attendanceCard" style="display: none;">
+                    <h3>📊 My Attendance</h3>
+                    <div class="info-item">
+                        <span class="info-label">Total Events</span>
+                        <span class="info-value" id="totalEvents">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Attended</span>
+                        <span class="info-value" id="attendedEvents">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Absent</span>
+                        <span class="info-value" id="absentEvents">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Attendance Rate</span>
+                        <span class="info-value" id="attendanceRate">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Management Section (Only for activity creator/admin) -->
+            <div id="event-management-container" class="event-management-section" style="display: none;">
+                <div class="event-header">
+                    <h3>🎯 Manage Events</h3>
+                    <button class="btn-add-event" onclick="EventManager.showAddEventModal()">
+                        <i class="fas fa-plus"></i>
+                        Add Event
+                    </button>
+                </div>
+                <div id="events-list" class="events-list">
+                    <div class="empty-events">
+                        <i class="fas fa-calendar-alt"></i>
+                        <p>No events scheduled yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events Section (For all users) -->
+            <div class="upcoming-events-section">
+                <h3>📆 Upcoming Events</h3>
+                <div id="upcoming-events-list" class="upcoming-events-list">
+                    <div class="empty-events">
+                        <i class="fas fa-calendar-check"></i>
+                        <p>No upcoming events</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Add/Edit Modal -->
+    <div id="event-modal" class="event-modal">
+        <div class="event-modal-content">
+            <div class="event-modal-header">
+                <h3 id="event-modal-title">Add New Event</h3>
+                <button class="btn-close-modal" onclick="EventManager.closeEventModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="event-form" class="event-form" onsubmit="EventManager.saveEvent(event)">
+                <div class="form-group">
+                    <label for="event-title">Event Title *</label>
+                    <input type="text" id="event-title" required maxlength="255" 
+                           placeholder="Enter event title">
+                </div>
+                <div class="form-group">
+                    <label for="event-start-date">Start Date & Time *</label>
+                    <input type="datetime-local" id="event-start-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-end-date">End Date & Time *</label>
+                    <input type="datetime-local" id="event-end-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-description">Description</label>
+                    <textarea id="event-description" rows="4" 
+                              placeholder="Enter event description (optional)"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="EventManager.closeEventModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-submit">
+                        Add Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Participants Modal -->
+    <div id="participantsModal" class="event-modal" style="display: none;">
+        <div class="event-modal-content" style="max-width: 800px;">
+            <div class="event-modal-header">
+                <h2>👥 Manage Participants</h2>
+                <button class="event-modal-close" onclick="closeParticipantsModal()">&times;</button>
+            </div>
+            <div class="event-modal-body" style="max-height: 600px; overflow-y: auto;">
+                <div id="participantsLoadingState" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: #667eea;"></i>
+                    <p style="margin-top: 16px; color: #718096;">Loading participants...</p>
+                </div>
+                <div id="participantsContent" style="display: none;">
+                    <div style="margin-bottom: 20px; padding: 16px; background: #f7fafc; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin: 0; color: #1a202c; font-size: 18px;">Total Participants</h3>
+                            <p style="margin: 4px 0 0 0; color: #718096; font-size: 14px;">Registered students for this activity</p>
+                        </div>
+                        <div style="font-size: 32px; font-weight: bold; color: #667eea;" id="totalParticipantsCount">0</div>
+                    </div>
+                    <div id="participantsList"></div>
+                </div>
+                <div id="participantsEmptyState" style="display: none; text-align: center; padding: 40px;">
+                    <i class="fas fa-users-slash" style="font-size: 48px; color: #cbd5e0;"></i>
+                    <p style="margin-top: 16px; color: #718096; font-size: 16px;">No participants yet</p>
+                    <p style="color: #a0aec0; font-size: 14px;">Students will appear here once they register</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/js/api.js"></script>
+    <script src="src/js/event-manager.js"></script>
+    <script src="src/js/upcoming-events.js"></script>
+    <script src="activity-details.js"></script>
+</body>
+</html>

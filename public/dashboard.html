@@ -1,218 +1,175 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MFU Activity Board - Dashboard</title>
+    <title>Dashboard - MFU Activity Board</title>
     <link rel="stylesheet" href="src/css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        // Set user role immediately to prevent flickering
+        (function() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.documentElement.setAttribute('data-user-role', userData.role || 'student');
+            }
+        })();
+    </script>
 </head>
 <body>
-    <!-- Mobile Menu Overlay -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
-    
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar open" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
                 <div class="logo-text">MFU</div>
                 <span class="brand-text">Activity Board</span>
             </div>
         </div>
-        
         <nav class="sidebar-nav">
             <ul class="nav-list">
                 <li class="nav-item active">
-                    <a href="#" class="nav-link">
+                    <a href="dashboard.html" class="nav-link">
                         <i class="fas fa-list"></i>
-                        <span>Feed</span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="my-activities.html" class="nav-link">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>My Activities</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="calendar.html" class="nav-link">
-                        <i class="fas fa-calendar"></i>
+                        <i class="fas fa-calendar-alt"></i>
                         <span>Calendar</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-user"></i>
-                        <span>My Activities</span>
+                    <a href="qr-scanner.html" class="nav-link">
+                        <i class="fas fa-qrcode"></i>
+                        <span>QR Scanner</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="createActivityNav" data-role="organizer,admin">
+                    <a href="activity-form.html" class="nav-link">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Create Activity</span>
+                    </a>
+                </li>
+                <li class="nav-item" id="adminNav" data-role="admin">
+                    <a href="admin-approval.html" class="nav-link">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Admin Panel</span>
                     </a>
                 </li>
             </ul>
         </nav>
-        
         <div class="sidebar-footer">
-            <a href="index.html" class="logout-link">
+            <a href="#" class="logout-link" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Log out</span>
             </a>
         </div>
     </aside>
-
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Header -->
         <header class="top-header">
             <div class="header-left">
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="header-logo">
-                    <div class="flame-icon">🔥</div>
+                    <div class="flame-icon"></div>
                     <span class="header-brand">MFU Activity Board</span>
                 </div>
             </div>
-            
             <div class="header-center">
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" placeholder="Find activities, clubs organizer..." class="search-input">
+                    <input type="text" placeholder="Search activities..." class="search-input" id="searchInput">
                 </div>
             </div>
-            
             <div class="header-right">
-                <div class="user-profile" id="userProfile">
-                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face" alt="Profile" class="profile-img">
-                    <span class="profile-name">Miss Jane Doe</span>
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge" style="display:none;">0</span>
+                </button>
+                <div class="user-profile" id="userProfileBtn" style="cursor:pointer;">
+                    <img id="headerProfileImg" src="" alt="Profile" class="profile-img">
+                    <span id="headerProfileName" class="profile-name">Loading...</span>
                 </div>
             </div>
         </header>
 
-        <!-- Content Area -->
+        <!-- Notification Dropdown -->
+        <div class="notification-dropdown" id="notificationDropdown">
+            <div class="notification-header">
+                <h3>Notifications</h3>
+                <button class="mark-all-read-btn" id="markAllReadBtn">Mark all as read</button>
+            </div>
+            <div class="notification-list" id="notificationList">
+                <div style="text-align:center;padding:20px;color:#9ca3af;">
+                    <i class="fas fa-bell-slash" style="font-size:24px;"></i>
+                    <p style="margin-top:10px;">No notifications</p>
+                </div>
+            </div>
+        </div>
+
         <div class="content-area">
             <div class="content-header">
-                <h1 class="page-title">Feed</h1>
-            </div>
-            
-            <!-- Activity Grid -->
-            <div class="activity-grid">
-                <!-- Activity Card 1 -->
-                <div class="activity-card" data-date="2025-10-13">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=200&fit=crop" alt="Basketball Tournament">
-                        <div class="status-tag registered">Registered</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Annual Basketball Tournament</h3>
-                        <div class="card-details">
-                            <div class="detail-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>13/3/26</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-clock"></i>
-                                <span>1:30 PM</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Basketball court</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity Card 2 -->
-                <div class="activity-card" data-date="2025-10-11">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=200&fit=crop" alt="Football Tournament">
-                        <div class="status-tag open">Open for Registration</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Football Tournament</h3>
-                        <div class="card-details">
-                            <div class="detail-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>12/3/26</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-clock"></i>
-                                <span>1:30 PM</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>MFU Outdoor stadium</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity Card 3 -->
-                <div class="activity-card" data-date="2025-10-11">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=200&fit=crop" alt="Archery Activity">
-                        <div class="status-tag registered">Registered</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Archery activity</h3>
-                        <div class="card-details">
-                            <div class="detail-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>12/3/26</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-clock"></i>
-                                <span>1:30 PM</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Some ajarn's house</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity Card 4 -->
-                <div class="activity-card" data-date="2025-10-10">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=200&fit=crop" alt="Archery Tournament">
-                        <div class="status-tag completed">Completed</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Archery activity first tournament</h3>
-                        <div class="card-details">
-                            <div class="detail-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>10/3/26</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-clock"></i>
-                                <span>1:30 PM</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Some ajarn's house</span>
-                            </div>
-                        </div>
-                    </div>
+                <h1 class="page-title">Activities Feed</h1>
+                <div class="filters-container">
+                    <select id="filterType" class="filter-select">
+                        <option value="">All Types</option>
+                        <option value="academic">Academic</option>
+                        <option value="sports">Sports</option>
+                        <option value="cultural">Cultural</option>
+                        <option value="social">Social</option>
+                        <option value="volunteer">Volunteer</option>
+                        <option value="workshop">Workshop</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <select id="filterStatus" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="past">Past</option>
+                    </select>
+                    <button id="clearFilters" class="clear-filters-btn">
+                        <i class="fas fa-times"></i> Clear Filters
+                    </button>
                 </div>
             </div>
-
-            <!-- Pagination -->
-            <div class="pagination">
-                <a href="#" class="pagination-btn prev">
-                    <i class="fas fa-chevron-left"></i>
-                    <span>Previous</span>
-                </a>
-                <div class="pagination-numbers">
-                    <a href="#" class="page-number active">1</a>
-                    <a href="#" class="page-number">2</a>
-                    <a href="#" class="page-number">3</a>
-                    <span class="page-ellipsis">...</span>
-                    <a href="#" class="page-number">67</a>
-                    <a href="#" class="page-number">68</a>
+            <div class="activity-grid" id="activityGrid">
+                <div style="text-align:center;padding:60px 20px;color:#667eea;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:32px;"></i>
+                    <p>Loading activities...</p>
                 </div>
-                <a href="#" class="pagination-btn next">
-                    <span>Next</span>
-                    <i class="fas fa-chevron-right"></i>
-                </a>
             </div>
         </div>
     </main>
-
+    <div id="profileModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:12px;padding:30px;max-width:500px;width:90%;position:relative;">
+            <button id="closeProfileModal" style="position:absolute;top:15px;right:15px;background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>
+            <img id="modalProfileImg" src="" alt="Profile" style="width:128px;height:128px;border-radius:50%;display:block;margin:0 auto 20px;">
+            <div style="text-align:center;">
+                <h2 id="modalProfileName" style="margin:0 0 8px 0;">Loading...</h2>
+                <p id="modalProfileEmail">email@mfu.ac.th</p>
+                <span id="modalProfileRole" style="display:inline-block;background:#667eea;color:white;padding:4px 12px;border-radius:12px;font-size:12px;">STUDENT</span>
+            </div>
+            <div style="padding:12px 0;border-bottom:1px solid #eee;margin-top:20px;">
+                <i class="fas fa-id-card" style="color:#667eea;margin-right:8px;"></i>
+                Student ID: <strong id="modalStudentId">-</strong>
+            </div>
+            <div style="text-align:center;margin-top:20px;">
+                <button id="closeProfileModalBtn" style="background:#6c757d;color:white;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;">Close</button>
+            </div>
+        </div>
+    </div>
     <script src="src/js/api.js"></script>
+    <script src="src/js/notifications.js"></script>
     <script src="src/js/dashboard.js"></script>
 </body>
 </html>
