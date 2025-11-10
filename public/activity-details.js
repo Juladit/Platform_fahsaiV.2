@@ -246,12 +246,16 @@ function updateActionButtons() {
     const isClosed = activity.status === 'closed' || activity.status === 'completed';
     const isAnnouncementOnly = activity.is_announcement_only;
     
-    // Show announcement badge if applicable
+    // Show announcement notice outside button group
     if (isAnnouncementOnly) {
-        const announcementBadge = document.createElement('div');
-        announcementBadge.style.cssText = 'background:#667eea;color:white;padding:10px 20px;border-radius:8px;text-align:center;font-weight:500;margin-bottom:15px;';
-        announcementBadge.innerHTML = '<i class="fas fa-bullhorn"></i> This is an announcement only - no registration required';
-        actionButtons.appendChild(announcementBadge);
+        const notice = document.getElementById('announcementNotice');
+        if (notice) {
+            notice.style.display = 'block';
+            notice.innerHTML = '<i class="fas fa-bullhorn"></i> This is an announcement only - no registration required';
+        }
+    } else {
+        const notice = document.getElementById('announcementNotice');
+        if (notice) notice.style.display = 'none';
     }
     
     // Check registration period
@@ -267,12 +271,14 @@ function updateActionButtons() {
             const timeUntilOpen = Math.ceil((regStart - now) / (1000 * 60 * 60 * 24));
             const statusDiv = document.createElement('div');
             statusDiv.style.cssText = 'background:#fff3cd;color:#856404;padding:10px 20px;border-radius:8px;text-align:center;font-weight:500;margin-bottom:15px;';
+            statusDiv.classList.add('action-info');
             statusDiv.innerHTML = `<i class="fas fa-clock"></i> Registration opens in ${timeUntilOpen} day${timeUntilOpen !== 1 ? 's' : ''}`;
             actionButtons.appendChild(statusDiv);
         } else if (regEnd && now > regEnd) {
             registrationStatus = 'closed';
             const statusDiv = document.createElement('div');
             statusDiv.style.cssText = 'background:#f8d7da;color:#721c24;padding:10px 20px;border-radius:8px;text-align:center;font-weight:500;margin-bottom:15px;';
+            statusDiv.classList.add('action-info');
             statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> Registration period has ended';
             actionButtons.appendChild(statusDiv);
         }
@@ -349,6 +355,25 @@ function updateActionButtons() {
         manageBtn.onclick = () => openParticipantsModal();
         actionButtons.appendChild(manageBtn);
     }
+
+    // Mark whether this is announcement-only for layout decisions
+    actionButtons.dataset.announcement = String(isAnnouncementOnly);
+
+    // Adjust layout based on number of primary actions
+    adjustActionButtonsLayout();
+}
+
+// Center the action buttons if there are few CTAs; left-align when many
+function adjustActionButtonsLayout() {
+    if (!actionButtons) return;
+    const ctaButtons = actionButtons.querySelectorAll('a.btn, button.btn');
+    const ctaCount = ctaButtons.length;
+    // Center when 1 or 2 primary CTAs and there is no registration-related info banner
+    const hasInfoBanner = actionButtons.querySelector('.action-info'); // announcement badge moved out
+    const isAnnouncement = actionButtons.dataset.announcement === 'true';
+    // For announcement pages, center even if there's an announcement badge
+    const shouldCenter = ctaCount > 0 && ctaCount <= 2 && (isAnnouncement || !hasInfoBanner);
+    actionButtons.classList.toggle('centered', shouldCenter);
 }
 
 // Handle register
@@ -408,15 +433,14 @@ async function handleUnregister() {
 
 // Update notification toggle based on registration status
 function updateNotificationToggle() {
-    const container = document.querySelector('.notification-toggle-container');
-    
-    if (!container) {
-        // Create container if doesn't exist
-        const actionBtns = document.querySelector('.action-buttons');
-        if (actionBtns && registration) {
-            const toggleContainer = document.createElement('div');
-            toggleContainer.className = 'notification-toggle-container';
-            toggleContainer.innerHTML = `
+    const container = document.getElementById('notificationToggleContainer');
+    if (!container) return;
+
+    if (registration) {
+        container.style.display = 'block';
+        // Render content only once
+        if (!container.querySelector('#notificationToggle')) {
+            container.innerHTML = `
                 <label class="notification-toggle">
                     <input type="checkbox" id="notificationToggle" ${registration.notifications_enabled !== false ? 'checked' : ''}>
                     <span class="toggle-slider"></span>
@@ -426,22 +450,14 @@ function updateNotificationToggle() {
                     </span>
                 </label>
             `;
-            actionBtns.parentNode.insertBefore(toggleContainer, actionBtns.nextSibling);
-            
-            // Add event listener
-            document.getElementById('notificationToggle').addEventListener('change', toggleNotifications);
+            const toggleEl = container.querySelector('#notificationToggle');
+            toggleEl.addEventListener('change', toggleNotifications);
+        } else {
+            const toggleEl = container.querySelector('#notificationToggle');
+            toggleEl.checked = registration.notifications_enabled !== false;
         }
     } else {
-        // Update existing toggle
-        if (registration) {
-            container.style.display = 'block';
-            const toggle = document.getElementById('notificationToggle');
-            if (toggle) {
-                toggle.checked = registration.notifications_enabled !== false;
-            }
-        } else {
-            container.style.display = 'none';
-        }
+        container.style.display = 'none';
     }
 }
 

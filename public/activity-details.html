@@ -53,7 +53,16 @@
             font-size: 28px;
             font-weight: 700;
             color: #333;
-            margin: 0 0 10px 0;
+            margin: 0;
+        }
+
+        /* Title row to place status next to the title */
+        .title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
         }
 
         .activity-meta {
@@ -94,16 +103,84 @@
             color: #721c24;
         }
 
-        .activity-description {
-            line-height: 1.6;
-            color: #555;
-            margin-bottom: 20px;
+        /* Announcement badge style (full width block) */
+        .announcement-badge {
+            background:#667eea;
+            color:white;
+            padding:10px 20px;
+            border-radius:8px;
+            text-align:center;
+            font-weight:500;
+            margin: 10px 0 15px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.25);
         }
 
+        .activity-description {
+            line-height: 1.65;
+            color: #444;
+            margin-bottom: 24px;
+            background: linear-gradient(145deg,#ffffff,#f7f9fc);
+            border: 1px solid #e2e8f0;
+            padding: 35px 20px 18px; /* extra top padding for floating label */
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+            white-space: pre-line;
+            overflow-wrap: anywhere; /* wrap long words/URLs */
+            word-break: break-word;   /* fallback for older browsers */
+            box-sizing: border-box;   /* guard against padding-induced overflow */
+        }
+
+        .activity-description::before {
+            content: "Description";
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 4px 12px 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 2px 6px rgba(102,126,234,0.35);
+        }
+
+    .activity-description p { margin: 0 0 1em; }
+    .activity-description p:last-child { margin-bottom: 0; }
+
         .action-buttons {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 10px;
+            margin-top: 16px; /* spacing from previous section */
+            align-items: stretch;
+        }
+
+        /* Center action buttons: switch to flex for true centering as a group */
+        .action-buttons.centered {
+            display: flex;
+            justify-content: center;
             flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            white-space: nowrap;
+            width: 100%; /* make each button fill its grid cell */
+            justify-content: center;
+        }
+
+        /* When centered (<=2 CTAs), let buttons shrink to content and truly center */
+        .action-buttons.centered .btn {
+            width: auto;
+            min-width: 180px;
+        }
+
+        /* Make info banners span full width within the grid */
+        .action-buttons .action-info,
+        .action-buttons .announcement-badge {
+            grid-column: 1 / -1;
         }
 
         .btn {
@@ -173,7 +250,9 @@
         .info-card h3 {
             margin: 0 0 15px 0;
             color: #333;
-            font-size: 18px;
+            font-size: 22px; /* larger for clarity, still < activity title */
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
         .info-item {
@@ -209,7 +288,38 @@
         .events-section h3 {
             margin: 0 0 20px 0;
             color: #333;
-            font-size: 18px;
+            font-size: 22px; /* match other section heading */
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Upcoming events section heading override */
+        .upcoming-events-section h3 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Manage Events heading: match other section headings */
+        .event-header h3 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            color: #333;
+        }
+
+        /* Center the empty upcoming events state across full grid width */
+        .upcoming-events-list .empty-events {
+            grid-column: 1 / -1; /* span all columns */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 180px;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            gap: 0.5rem;
         }
 
         .event-card {
@@ -329,6 +439,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-top: 20px;
+            margin-bottom: 16px; /* add space before action buttons */
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
@@ -396,6 +507,10 @@
                 font-size: 24px;
             }
 
+            /* On mobile, keep equal-width grid with slightly smaller min width */
+            .action-buttons { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+            .action-buttons .btn { min-width: 0; }
+
             .info-grid {
                 grid-template-columns: 1fr;
             }
@@ -421,7 +536,10 @@
                     <img id="activityPoster" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" alt="Activity Poster">
                 </div>
 
-                <h1 class="activity-title" id="activityTitle">-</h1>
+                <div class="title-row">
+                    <h1 class="activity-title" id="activityTitle">-</h1>
+                    <span id="statusBadge" class="status-badge">-</span>
+                </div>
                 
                 <div class="activity-meta">
                     <div class="meta-item">
@@ -436,12 +554,15 @@
                         <span>👥</span>
                         <span id="activityParticipants">-</span>
                     </div>
-                    <div class="meta-item">
-                        <span id="statusBadge" class="status-badge">-</span>
-                    </div>
                 </div>
 
                 <div class="activity-description" id="activityDescription">-</div>
+
+                <!-- Notifications Toggle (shown when registered) -->
+                <div id="notificationToggleContainer" class="notification-toggle-container" style="display: none;"></div>
+
+                <!-- Announcement notice (for announcement-only activities) -->
+                <div id="announcementNotice" class="announcement-badge" style="display:none;"></div>
 
                 <div class="action-buttons" id="actionButtons">
                     <!-- Dynamic buttons will be inserted here -->
@@ -450,7 +571,7 @@
 
             <div class="info-grid">
                 <div class="info-card">
-                    <h3>📋 Activity Information</h3>
+                    <h3>Activity Information</h3>
                     <div class="info-item">
                         <span class="info-label">Type</span>
                         <span class="info-value" id="activityType">-</span>
@@ -493,7 +614,7 @@
             <!-- Event Management Section (Only for activity creator/admin) -->
             <div id="event-management-container" class="event-management-section" style="display: none;">
                 <div class="event-header">
-                    <h3>🎯 Manage Events</h3>
+                    <h3>Manage Events</h3>
                     <button class="btn-add-event" onclick="EventManager.showAddEventModal()">
                         <i class="fas fa-plus"></i>
                         Add Event
@@ -509,7 +630,7 @@
 
             <!-- Upcoming Events Section (For all users) -->
             <div class="upcoming-events-section">
-                <h3>📆 Upcoming Events</h3>
+                <h3>Upcoming Events</h3>
                 <div id="upcoming-events-list" class="upcoming-events-list">
                     <div class="empty-events">
                         <i class="fas fa-calendar-check"></i>
