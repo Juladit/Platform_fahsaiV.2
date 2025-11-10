@@ -30,15 +30,25 @@ const sidebar = document.getElementById('sidebar');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const mobileOverlay = document.getElementById('mobileOverlay');
 
-mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    mobileOverlay.classList.toggle('active');
-});
+if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        // Use the same overlay class as other pages ("show")
+        mobileOverlay.classList.toggle('show');
 
-mobileOverlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    mobileOverlay.classList.remove('active');
-});
+        // Update ARIA state for accessibility
+        const expanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
+        mobileMenuBtn.setAttribute('aria-expanded', (!expanded).toString());
+    });
+}
+
+if (mobileOverlay) {
+    mobileOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        mobileOverlay.classList.remove('show');
+        if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    });
+}
 
 // Logout functionality
 document.getElementById('logoutBtn').addEventListener('click', (e) => {

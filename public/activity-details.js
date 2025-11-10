@@ -160,7 +160,17 @@ function displayActivityDetails() {
     activityTitle.textContent = activity.title;
     activityDates.textContent = `${formatDate(activity.start_date)} - ${formatDate(activity.end_date)}`;
     activityLocation.textContent = activity.location || 'TBA';
-    activityParticipants.textContent = `${activity.current_participants || 0} / ${activity.max_participants} participants`;
+    // Hide participant counts for announcement-only activities
+    if (activity.is_announcement_only) {
+        if (activityParticipants && activityParticipants.parentElement) {
+            activityParticipants.parentElement.style.display = 'none';
+        }
+    } else {
+        if (activityParticipants && activityParticipants.parentElement) {
+            activityParticipants.parentElement.style.display = '';
+        }
+        activityParticipants.textContent = `${activity.current_participants || 0} / ${activity.max_participants} participants`;
+    }
     
     // Status badge
     statusBadge.textContent = activity.status;

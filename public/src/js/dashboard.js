@@ -184,7 +184,10 @@ function createCard(a) {
     cardContent += '<div class=\"detail-item\"><i class=\"fas fa-calendar\"></i><span>' + fdate + '</span></div>';
     cardContent += '<div class=\"detail-item\"><i class=\"fas fa-clock\"></i><span>' + ftime + '</span></div>';
     cardContent += '<div class=\"detail-item\"><i class=\"fas fa-map-marker-alt\"></i><span>' + (a.location || 'TBA') + '</span></div>';
-    cardContent += '<div class=\"detail-item\"><i class=\"fas fa-users\"></i><span>' + (a.current_participants || 0) + '/' + a.max_participants + '</span></div>';
+    // Hide participant numbers for announcement-only activities
+    if (!a.is_announcement_only) {
+        cardContent += '<div class=\"detail-item\"><i class=\"fas fa-users\"></i><span>' + (a.current_participants || 0) + '/' + a.max_participants + '</span></div>';
+    }
     cardContent += '</div>';
     
     // Add external link button if available
@@ -289,7 +292,7 @@ function setupListeners() {
 
 function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const typeFilter = document.getElementById('filterType').value;
+    const typeFilter = document.getElementById('filterType').value.toLowerCase();
     const statusFilter = document.getElementById('filterStatus').value;
     
     let filtered = allActivities;
@@ -305,7 +308,8 @@ function applyFilters() {
     // Type filter
     if (typeFilter) {
         filtered = filtered.filter(function(a) {
-            return a.activity_type === typeFilter;
+            // Normalize both sides to lowercase to make filtering case-insensitive
+            return (a.activity_type || '').toLowerCase() === typeFilter;
         });
     }
     

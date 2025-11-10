@@ -205,6 +205,11 @@ html[data-user-role="admin"] .nav-item[data-role*="organizer"] {
     color: #1a1a1a;
 }
 
+/* Hide the top header brand text. The left sidebar keeps the visible "Activity Board" label. */
+.header-brand {
+    display: none;
+}
+
 .header-center {
     flex: 1;
     max-width: 500px;

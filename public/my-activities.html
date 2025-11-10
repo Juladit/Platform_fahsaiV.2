@@ -251,7 +251,7 @@
 <body>
     <!-- Sidebar -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
-    <aside class="sidebar open" id="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
                 <div class="logo-text">MFU</div>
@@ -310,7 +310,7 @@
     <main class="main-content">
         <header class="top-header">
             <div class="header-left">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-controls="sidebar" aria-expanded="false">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="header-logo">
@@ -778,13 +778,34 @@
         }
 
         // Initialize
-        async function init() {
-            const authenticated = await checkAuth();
-            if (authenticated) {
-                setupTabs();
-                loadCreatedActivities();
+            async function init() {
+                const authenticated = await checkAuth();
+                if (authenticated) {
+                    setupTabs();
+
+                    // If the user is a student, they cannot create activities.
+                    // Hide the "Created by Me" tab and load the registered activities instead.
+                    if (currentUser && currentUser.role === 'student') {
+                        const createdTabBtn = document.querySelector('.tab[data-tab="created"]');
+                        const createdTabContent = document.getElementById('created-tab');
+                        const registeredTabBtn = document.querySelector('.tab[data-tab="registered"]');
+
+                        if (createdTabBtn) createdTabBtn.remove();
+                        if (createdTabContent) createdTabContent.remove();
+
+                        // Activate registered tab button and content so it's visible immediately
+                        if (registeredTabBtn) registeredTabBtn.classList.add('active');
+                        const registeredTabContent = document.getElementById('registered-tab');
+                        if (registeredTabContent) registeredTabContent.classList.add('active');
+
+                        // Load registered activities immediately
+                        loadRegisteredActivities();
+                    } else {
+                        // Organizers and admins can view created activities
+                        loadCreatedActivities();
+                    }
+                }
             }
-        }
 
         init();
     </script>

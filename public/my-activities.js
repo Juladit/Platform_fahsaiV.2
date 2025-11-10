@@ -197,10 +197,12 @@ function createActivityCard(activity) {
                         <span>📍</span>
                         <span>${activity.location || 'TBA'}</span>
                     </div>
+                    ${!activity.is_announcement_only ? `
                     <div class="meta-item">
                         <span>👥</span>
                         <span>${activity.current_participants || 0} / ${activity.max_participants}</span>
                     </div>
+                    ` : ''}
                 </div>
                 
                 ${showAttendance ? `
