@@ -146,10 +146,18 @@ function createCard(a) {
     const card = document.createElement('div');
     card.className = 'activity-card';
     
-    const date = new Date(a.start_date || a.event_date);
-    const endDate = new Date(a.end_date);
-    const fdate = date.toLocaleDateString('en-GB');
-    const ftime = date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
+        const startDateObj = new Date(a.start_date || a.event_date);
+        const endDateObj = a.end_date ? new Date(a.end_date) : null;
+        const ftime = startDateObj.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
+
+        // Build date range display
+        let dateDisplay = startDateObj.toLocaleDateString('en-GB');
+        if (endDateObj && !isNaN(endDateObj)) {
+            const sameDay = startDateObj.toDateString() === endDateObj.toDateString();
+            if (!sameDay) {
+                dateDisplay = `${dateDisplay} - ${endDateObj.toLocaleDateString('en-GB')}`;
+            }
+        }
     
     const now = new Date();
     const spots = a.max_participants - (a.current_participants || 0);
@@ -164,7 +172,7 @@ function createCard(a) {
         status = '<div class=\"status-tag\" style=\"background:#fff3cd;color:#856404;\">Pending Approval</div>';
     } else if (a.approval_status === 'rejected') {
         status = '<div class=\"status-tag\" style=\"background:#f8d7da;color:#721c24;\">Rejected</div>';
-    } else if (endDate < now) {
+        } else if (endDateObj && endDateObj < now) {
         status = '<div class=\"status-tag closed\">Ended</div>';
     } else if (spots <= 0) {
         status = '<div class=\"status-tag full\">Full</div>';
@@ -181,8 +189,11 @@ function createCard(a) {
     cardContent += '<div class=\"card-content\">';
     cardContent += '<h3 class=\"card-title\">' + a.title + '</h3>';
     cardContent += '<div class=\"card-details\">';
-    cardContent += '<div class=\"detail-item\"><i class=\"fas fa-calendar\"></i><span>' + fdate + '</span></div>';
-    cardContent += '<div class=\"detail-item\"><i class=\"fas fa-clock\"></i><span>' + ftime + '</span></div>';
+        cardContent += '<div class=\"detail-item\"><i class=\"fas fa-calendar\"></i><span>' + dateDisplay + '</span></div>';
+        // Show time only for non-announcement activities
+        if (!a.is_announcement_only) {
+            cardContent += '<div class=\"detail-item\"><i class=\"fas fa-clock\"></i><span>' + ftime + '</span></div>';
+        }
     cardContent += '<div class=\"detail-item\"><i class=\"fas fa-map-marker-alt\"></i><span>' + (a.location || 'TBA') + '</span></div>';
     // Hide participant numbers for announcement-only activities
     if (!a.is_announcement_only) {

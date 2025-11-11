@@ -24,6 +24,7 @@ const newPasswordInput = document.getElementById('newPassword');
 const confirmPasswordInput = document.getElementById('confirmPassword');
 const passwordStrength = document.getElementById('passwordStrength');
 const passwordStrengthBar = document.getElementById('passwordStrengthBar');
+const toggleButtons = document.querySelectorAll('.toggle-password-btn');
 
 // Load user profile
 async function loadProfile() {
@@ -260,3 +261,15 @@ avatarUploadInput.addEventListener('change', async function(e) {
 
 // Initialize
 loadProfile();
+
+// Password visibility toggles
+toggleButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        if (!input) return;
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        btn.innerHTML = `<i class="fas fa-${isPassword ? 'eye-slash' : 'eye'}"></i>`;
+    });
+});

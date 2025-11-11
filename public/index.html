@@ -6,8 +6,37 @@
     <title>MFU Activity Board - Login</title>
     <link rel="stylesheet" href="src/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Login page background layers */
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(1200px 800px at 20% 20%, rgba(220, 38, 38, 0.08), rgba(255,255,255,0) 60%),
+                        radial-gradient(1000px 700px at 80% 30%, rgba(102, 126, 234, 0.08), rgba(255,255,255,0) 60%),
+                        linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            filter: blur(12px);
+            opacity: 0.95;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .animated-bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* Ensure foreground content sits above */
+        .container { position: relative; z-index: 2; }
+        /* Reduce motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            .animated-bg-canvas { display: none; }
+        }
+    </style>
 </head>
 <body>
+    <!-- Background layers -->
+    <div class="bg-gradient" aria-hidden="true"></div>
+    <canvas id="bgWords" class="animated-bg-canvas" aria-hidden="true"></canvas>
     <div class="container">
         <!-- Header -->
         <header class="header">
@@ -51,6 +80,7 @@
     </div>
 
     <script src="src/js/api.js"></script>
+    <script src="src/js/login-bg.js?v=20251111.2"></script>
     <script src="src/js/script.js"></script>
 </body>
 </html>
