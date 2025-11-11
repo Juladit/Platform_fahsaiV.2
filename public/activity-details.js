@@ -347,8 +347,8 @@ function updateActionButtons() {
         actionButtons.appendChild(editBtn);
     }
     
-    // Manage participants (owner or admin)
-    if ((isOwner || isAdmin) && (isOrganizer || isAdmin)) {
+    // Manage participants (owner or admin) — hidden for announcement-only activities
+    if (!isAnnouncementOnly && (isOwner || isAdmin) && (isOrganizer || isAdmin)) {
         const manageBtn = document.createElement('button');
         manageBtn.className = 'btn btn-secondary';
         manageBtn.innerHTML = '👥 Manage Participants';
